@@ -1,0 +1,10 @@
+// Cloudflare Workers config: serves public/ as static files and sends /api/* to worker.js.
+{
+  "name": "awesome-vibe-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public",
+    "run_worker_first": ["/api/*"]
+  }
+}
