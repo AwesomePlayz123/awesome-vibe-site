@@ -7,11 +7,24 @@ import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import * as game from './functions/api/game.js';
 import * as file from './functions/api/file.js';
+import * as clipart from './functions/api/clipart.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT) || 3000;
-const ROUTES = { '/api/game': game, '/api/file': file };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart };
+
+// Secrets for local runs: environment variables, or a .dev.vars file (KEY=value per line, same as Cloudflare's tooling).
+const env = { ...process.env };
+try {
+  const text = await fsp.readFile(path.join(__dirname, '.dev.vars'), 'utf8');
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*"?(.*?)"?\s*$/i);
+    if (m) env[m[1]] = m[2];
+  }
+} catch {
+  /* no .dev.vars — fine */
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -57,7 +70,7 @@ const server = http.createServer(async (req, res) => {
       const headers = new Headers();
       for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.set(k, v);
       const request = new Request(url, { method: 'GET', headers });
-      return await sendResponse(res, await route.onRequestGet({ request }));
+      return await sendResponse(res, await route.onRequestGet({ request, env }));
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return res.writeHead(405).end();
     await serveStatic(res, url.pathname);

@@ -1,6 +1,6 @@
 # awesome-vibe-site
 
-Little tools that speed up YouTube editing.
+Little tools that speed up YouTube editing. Two tabs so far: **Steam Kit** and **Clipart Finder**.
 
 ## Steam Kit
 
@@ -15,6 +15,18 @@ Paste a Steam store link (or just the app id) and get everything you need for a 
 
 Works with links like `https://store.steampowered.com/app/548430/Deep_Rock_Galactic/`, `steamcommunity.com/app/548430`, `steamdb.info/app/548430`, or `548430`.
 You can also link straight to a game with `?app=548430` (add `&cc=ca` for Canadian prices, etc.).
+
+## Clipart Finder
+
+Type keywords and get the 10 most relevant images from [Pixabay](https://pixabay.com/) (clip art/vectors by default, or illustrations, photos, everything). Tick **Transparent background only** for cut-out PNGs, and **Show 10 more** for further results. Pixabay's license allows commercial use with no credit needed in your videos; the site itself shows a small "Images from Pixabay" line, as Pixabay's API terms ask. Skip images that show logos, brands or recognizable people in monetized videos.
+
+It needs a free Pixabay API key:
+
+1. Sign up at pixabay.com, then copy your key from https://pixabay.com/api/docs/ (shown in the `key` parameter row while you're logged in).
+2. In Cloudflare: your project → **Settings → Variables and Secrets → Add** → type **Secret**, name `PIXABAY_API_KEY`, paste the key, save.
+3. Redeploy (Deployments → ⋯ → Retry deployment) so the secret takes effect.
+
+For local runs, create a `.dev.vars` file next to `server.js` containing `PIXABAY_API_KEY=your-key` (it's git-ignored).
 
 ## Hosting on Cloudflare (free)
 
@@ -40,17 +52,18 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | Route | What it does |
 | --- | --- |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
-| `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments) so the page can use them and save them with tidy names. Only Steam CDN URLs are accepted. |
+| `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments) and Pixabay, so the page can use them and save them with tidy names. Only those hosts are accepted. |
+| `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
 
 **Trailers** are converted in your browser. Steam streams trailers in small pieces (HLS) rather than offering one file, so `public/trailer.js` picks the highest-quality H.264 stream, downloads its pieces, and uses [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) to join video and audio into one MP4 — a straight copy, no re-encoding. The first trailer you download also loads the converter (~30 MB, from jsDelivr), after which the browser caches it.
 
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, file.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, file.js, clipart.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, app.js (canvas rendering), trailer.js
+public/           the page: index.html, styles.css, nav.js (tabs), app.js + trailer.js (Steam Kit), clipart.js
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

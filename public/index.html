@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Steam Kit · awesome-vibe-site</title>
+  <title>awesome-vibe-site</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
@@ -12,13 +12,15 @@
     <div class="brand">
       <span class="dot"></span>
       <span>awesome-vibe-site</span>
-      <span class="sep">/</span>
-      <strong>Steam Kit</strong>
     </div>
-    <span class="hint">Editing assets in one paste</span>
+    <nav class="tabs" aria-label="Tools">
+      <a href="#steam" data-view="steam" class="on">Steam Kit</a>
+      <a href="#clipart" data-view="clipart">Clipart Finder</a>
+    </nav>
   </header>
 
   <main>
+   <div class="view" id="view-steam">
     <section class="hero">
       <h1>Paste a Steam link. Get the editing kit.</h1>
       <p>Logo, cover art and case mockup, the store info card, and trailers — ready to drop into your timeline.</p>
@@ -101,8 +103,40 @@
         </article>
       </div>
     </section>
+   </div>
+
+   <div class="view" id="view-clipart" hidden>
+    <section class="hero">
+      <h1>Free clip art for your edits.</h1>
+      <p>Search by keyword and grab images that are free for commercial use — no credit needed in your videos.</p>
+      <form id="clipSearch" class="lookup" autocomplete="off">
+        <input id="clipQ" name="q" type="search" placeholder="e.g. pickaxe, explosion, treasure chest" required />
+        <select id="clipType" aria-label="Kind of image">
+          <option value="vector">Clip art (vectors)</option>
+          <option value="illustration">Illustrations</option>
+          <option value="all">Everything</option>
+          <option value="photo">Photos</option>
+        </select>
+        <button type="submit" id="clipGo">Search</button>
+      </form>
+      <div class="search-opts">
+        <label class="check"><input type="checkbox" id="clipTransparent" checked /> Transparent background only</label>
+      </div>
+      <div id="clipStatus" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="clipResults" hidden>
+      <div id="clipGrid" class="clip-grid"></div>
+      <div class="clip-foot">
+        <button class="btn ghost" id="clipMore" hidden>Show 10 more</button>
+        <p class="credit">Images from <a href="https://pixabay.com/" target="_blank" rel="noopener">Pixabay</a> · free for commercial use under the <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener">Pixabay Content License</a>. Avoid images showing logos, brands or recognizable people in monetized videos.</p>
+      </div>
+    </section>
+   </div>
   </main>
 
+  <script src="/nav.js" type="module"></script>
   <script src="/app.js" type="module"></script>
+  <script src="/clipart.js" type="module"></script>
 </body>
 </html>
