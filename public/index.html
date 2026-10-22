@@ -178,14 +178,19 @@
    <div class="view" id="view-audio" hidden>
     <section class="hero">
       <h1>Sound effects and music.</h1>
-      <p>Preview right here, download what you like. Sound effects are public domain; music needs a one-line credit, which you can copy.</p>
+      <p id="audioIntro">Preview right here, download what you like. Sound effects are public domain; music needs a one-line credit, which you can copy.</p>
+      <div class="seg seg-lg audio-kind" id="audioKind" role="tablist" aria-label="What to search">
+        <button type="button" data-kind="sfx" class="on">Sound FX</button>
+        <button type="button" data-kind="music">Music</button>
+        <button type="button" data-kind="playlists">Playlists</button>
+      </div>
       <form id="audioSearch" class="lookup" autocomplete="off">
         <input id="audioQ" name="q" type="search" placeholder="e.g. explosion, coin pickup, chill lofi" required />
-        <div class="seg seg-lg" id="audioKind" role="tablist" aria-label="What to search">
-          <button type="button" data-kind="sfx" class="on">Sound FX</button>
-          <button type="button" data-kind="music">Music</button>
-        </div>
         <button type="submit" id="audioGo">Search</button>
+      </form>
+      <form id="plForm" class="lookup" autocomplete="off" hidden>
+        <input id="plUrl" type="text" placeholder="Paste a Spotify playlist or album link" spellcheck="false" />
+        <button type="submit" id="plGo">Load</button>
       </form>
       <p class="note" id="musicNote" hidden>Music tracks are free to use commercially with credit, but some artists also register tracks with YouTube Content ID, so a monetized video can still get a claim. For background music in monetized videos, YouTube Studio's Audio Library is the safest option.</p>
       <div id="audioStatus" class="status" role="status" aria-live="polite"></div>
@@ -197,6 +202,25 @@
         <button class="btn ghost" id="audioMore" hidden>Show 10 more</button>
         <p class="credit" id="audioCredit"></p>
       </div>
+    </section>
+
+    <section id="plPane" class="pl-pane" hidden>
+      <aside class="card pl-saved">
+        <header><h3>Saved playlists</h3><span class="tag">this browser</span></header>
+        <ul id="plList" class="pl-list"></ul>
+        <p class="empty-note" id="plEmpty">Nothing saved yet. Load a playlist and hit <b>Save</b>.</p>
+      </aside>
+      <article class="card pl-player">
+        <header>
+          <h3 id="plTitle">Spotify player</h3>
+          <div class="actions">
+            <button class="btn" id="plSave" type="button" hidden>Save</button>
+            <a class="btn ghost" id="plOpen" target="_blank" rel="noopener" hidden>Open in Spotify ↗</a>
+          </div>
+        </header>
+        <div id="plEmbed" class="pl-embed"><p class="empty-note">Paste a playlist link above, or pick a saved one.</p></div>
+        <p class="credit pl-tip">Playing full songs needs you to be logged into Spotify in this browser; otherwise you get 30-second previews. To use a song in a Short, add it through the YouTube Shorts editor's <b>Add sound</b>, which keeps it licensed.</p>
+      </article>
     </section>
     <audio id="player" preload="none"></audio>
    </div>
@@ -267,6 +291,7 @@
   <script src="/app.js" type="module"></script>
   <script src="/clipart.js" type="module"></script>
   <script src="/audio.js" type="module"></script>
+  <script src="/playlists.js" type="module"></script>
   <script src="/comments.js" type="module"></script>
 </body>
 </html>

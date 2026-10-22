@@ -27,10 +27,26 @@ function setStatus(msg, isErr = false) {
   el.classList.toggle('err', isErr);
 }
 
+const INTROS = {
+  sfx: 'Preview right here, download what you like. Sound effects are public domain; music needs a one-line credit, which you can copy.',
+  music: 'Preview right here, download what you like. Sound effects are public domain; music needs a one-line credit, which you can copy.',
+  playlists: 'Keep your Spotify playlists handy: paste a link to listen, save it, and come back to it in one click.',
+};
+
 function setKind(kind) {
   state.kind = kind;
+  const pl = kind === 'playlists';
   for (const b of document.querySelectorAll('#audioKind button')) b.classList.toggle('on', b.dataset.kind === kind);
   $('#musicNote').hidden = kind !== 'music';
+  $('#audioSearch').hidden = pl;
+  $('#plForm').hidden = !pl;
+  $('#plPane').hidden = !pl;
+  $('#audioResults').hidden = pl || !$('#audioList').children.length;
+  $('#audioIntro').textContent = INTROS[kind];
+  if (pl) {
+    stop();
+    setStatus('');
+  }
   $('#audioQ').placeholder = kind === 'music' ? 'e.g. chill lofi, epic orchestral, retro synth' : 'e.g. explosion, coin pickup, door creak';
   try {
     localStorage.setItem('audio.kind', kind);
@@ -39,7 +55,7 @@ function setKind(kind) {
 
 try {
   const saved = localStorage.getItem('audio.kind');
-  if (saved === 'music' || saved === 'sfx') setKind(saved);
+  if (saved === 'music' || saved === 'sfx' || saved === 'playlists') setKind(saved);
 } catch {}
 
 async function search(append = false) {
@@ -244,6 +260,6 @@ for (const b of document.querySelectorAll('#audioKind button')) {
   b.addEventListener('click', () => {
     if (state.kind === b.dataset.kind) return;
     setKind(b.dataset.kind);
-    if ($('#audioQ').value.trim()) search(false);
+    if (b.dataset.kind !== 'playlists' && $('#audioQ').value.trim()) search(false);
   });
 }

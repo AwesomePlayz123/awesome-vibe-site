@@ -35,7 +35,9 @@ Search for **Sound FX** or **Music**, preview right on the page, and download.
 - **Sound FX** come from [Freesound](https://freesound.org/), public-domain (CC0) sounds only: free for commercial use, no credit needed. Downloads are Freesound's high-quality MP3 previews.
 - **Music** comes from [Jamendo](https://www.jamendo.com/). Only tracks whose Creative Commons license allows commercial use *and* use in a video are shown (no NC or ND licenses). These need credit: **Copy credit** gives you a line for your video description. Some tracks may still be registered with YouTube Content ID, so for monetized videos YouTube Studio's Audio Library is the safest option.
 
-It needs two more secrets, added the same way as the Pixabay one:
+- **Playlists**: paste a Spotify playlist or album link to listen in Spotify's own player (full songs if you're logged into Spotify in that browser, otherwise 30-second previews). **Save** keeps it in a list on that tab (stored in your browser), where you can rename, remove, or click to load it again. There's no downloading of Spotify songs; to use one in a Short, add it through the YouTube Shorts editor's **Add sound**.
+
+Sound FX and Music need two more secrets, added the same way as the Pixabay one:
 
 | Secret | Where to get it |
 | --- | --- |
@@ -73,6 +75,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
 | `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
+| `GET /api/spotify?url=…` | Gets a Spotify playlist's or album's name and cover (Spotify's public oEmbed) for the saved list. |
 | `GET /api/audio?q=…&kind=sfx\|music&offset=…` | Searches Freesound (CC0 only) or Jamendo (commercial + video-safe licenses only). Cached for 24 hours. |
 
 **Trailers** are converted in your browser. Steam streams trailers in small pieces (HLS) rather than offering one file, so `public/trailer.js` picks the highest-quality H.264 stream, downloads its pieces, and uses [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) to join video and audio into one MP4 — a straight copy, no re-encoding. The first trailer you download also loads the converter (~30 MB, from jsDelivr), after which the browser caches it.
@@ -80,10 +83,10 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, steam-search.js, file.js, clipart.js, audio.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, steam-search.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js, comments.js
+public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

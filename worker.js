@@ -5,9 +5,10 @@ import * as file from './functions/api/file.js';
 import * as clipart from './functions/api/clipart.js';
 import * as audio from './functions/api/audio.js';
 import * as steamSearch from './functions/api/steam-search.js';
+import * as spotify from './functions/api/spotify.js';
 import { json } from './lib/http.js';
 
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify };
 
 export default {
   async fetch(request, env) {
