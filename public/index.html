@@ -60,10 +60,14 @@
 
    <div class="view" id="view-steam">
     <section class="hero">
-      <h1>Paste a Steam link. Get the editing kit.</h1>
+      <h1>Find a game. Get the editing kit.</h1>
       <p>Logo, cover art and case mockup, the store info card, and trailers — ready to drop into your timeline.</p>
       <form id="lookup" class="lookup" autocomplete="off">
-        <input id="url" name="url" type="text" placeholder="https://store.steampowered.com/app/548430/Deep_Rock_Galactic/" required />
+        <div class="ac">
+          <input id="url" name="url" type="text" placeholder="Search a game, or paste a Steam link" required
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions" spellcheck="false" />
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </div>
         <select id="region" aria-label="Store region (sets the currency)">
           <option value="us">US $</option>
           <option value="ca">Canada CDN$</option>

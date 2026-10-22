@@ -75,10 +75,31 @@ function showImageOrEmpty(img, src, emptyText) {
 
 /* ---------------- Lookup ---------------- */
 
+// A Steam link or bare app id goes straight to the lookup; anything else is treated as a game name.
+const looksLikeLink = (s) => /^\d+$/.test(s) || /\/app\/\d+/i.test(s) || /^https?:\/\//i.test(s);
+
 $('#lookup').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const url = $('#url').value.trim();
-  if (!url) return;
+  const typed = $('#url').value.trim();
+  if (!typed) return;
+  closeSuggestions();
+
+  let url = typed;
+  if (ac.pick && typed === ac.pick.name) {
+    url = String(ac.pick.id);
+  } else if (!looksLikeLink(typed)) {
+    // Name typed but nothing picked: use the best match.
+    $('#go').disabled = true;
+    setStatus('Searching Steam…');
+    const items = await fetchSuggestions(typed).catch(() => null);
+    $('#go').disabled = false;
+    if (!items) return setStatus('Couldn’t reach Steam search. Try pasting the store link instead.', true);
+    if (!items.length) return setStatus(`No Steam game found for “${typed}”. Check the spelling or paste the store link.`, true);
+    ac.pick = items[0];
+    $('#url').value = items[0].name;
+    url = String(items[0].id);
+  }
+
   $('#go').disabled = true;
   setStatus('Asking Steam…');
   try {
@@ -96,6 +117,118 @@ $('#lookup').addEventListener('submit', async (e) => {
     $('#go').disabled = false;
   }
 });
+
+/* ---------------- Search-by-name suggestions ---------------- */
+
+const ac = { items: [], active: -1, pick: null, timer: null, seq: 0, cache: new Map() };
+const acInput = $('#url');
+const acList = $('#suggestions');
+
+async function fetchSuggestions(q) {
+  const key = `${$('#region').value}:${q.toLowerCase()}`;
+  if (ac.cache.has(key)) return ac.cache.get(key);
+  const res = await fetch(`/api/steam-search?q=${encodeURIComponent(q)}&cc=${$('#region').value}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Search failed');
+  ac.cache.set(key, data.items);
+  return data.items;
+}
+
+function closeSuggestions() {
+  acList.hidden = true;
+  acList.innerHTML = '';
+  ac.items = [];
+  ac.active = -1;
+  acInput.setAttribute('aria-expanded', 'false');
+  acInput.removeAttribute('aria-activedescendant');
+}
+
+function setActive(i) {
+  ac.active = i;
+  [...acList.children].forEach((li, j) => li.classList.toggle('active', j === i));
+  if (i >= 0) acInput.setAttribute('aria-activedescendant', `sugg-${i}`);
+  else acInput.removeAttribute('aria-activedescendant');
+  acList.children[i]?.scrollIntoView({ block: 'nearest' });
+}
+
+function showSuggestions(items) {
+  ac.items = items;
+  acList.innerHTML = '';
+  if (!items.length) return closeSuggestions();
+  items.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.id = `sugg-${i}`;
+    li.setAttribute('role', 'option');
+    const img = document.createElement('img');
+    img.alt = '';
+    img.src = proxied(item.image);
+    const name = document.createElement('span');
+    name.className = 'sugg-name';
+    name.textContent = item.name;
+    const price = document.createElement('span');
+    price.className = 'sugg-price';
+    if (item.price) {
+      if (item.price.discount) {
+        const d = document.createElement('b');
+        d.textContent = `-${item.price.discount}%`;
+        price.appendChild(d);
+      }
+      price.append(item.price.final);
+    }
+    li.append(img, name, price);
+    // mousedown (not click) so it fires before the input loses focus
+    li.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      choose(i);
+    });
+    acList.appendChild(li);
+  });
+  acList.hidden = false;
+  acInput.setAttribute('aria-expanded', 'true');
+  setActive(-1);
+}
+
+function choose(i) {
+  const item = ac.items[i];
+  if (!item) return;
+  ac.pick = item;
+  acInput.value = item.name;
+  closeSuggestions();
+  $('#lookup').requestSubmit();
+}
+
+acInput.addEventListener('input', () => {
+  const q = acInput.value.trim();
+  ac.pick = null;
+  clearTimeout(ac.timer);
+  if (q.length < 2 || looksLikeLink(q)) return closeSuggestions();
+  ac.timer = setTimeout(async () => {
+    const seq = ++ac.seq;
+    try {
+      const items = await fetchSuggestions(q);
+      if (seq === ac.seq && acInput.value.trim() === q) showSuggestions(items);
+    } catch {
+      /* suggestions are best-effort; Enter still searches */
+    }
+  }, 220);
+});
+
+acInput.addEventListener('keydown', (e) => {
+  if (acList.hidden) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    setActive((ac.active + 1) % ac.items.length);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    setActive(ac.active <= 0 ? ac.items.length - 1 : ac.active - 1);
+  } else if (e.key === 'Enter' && ac.active >= 0) {
+    e.preventDefault();
+    choose(ac.active);
+  } else if (e.key === 'Escape') {
+    closeSuggestions();
+  }
+});
+acInput.addEventListener('blur', () => setTimeout(closeSuggestions, 100));
 
 async function render(g) {
   $('#results').hidden = false;

@@ -9,11 +9,12 @@ import * as game from './functions/api/game.js';
 import * as file from './functions/api/file.js';
 import * as clipart from './functions/api/clipart.js';
 import * as audio from './functions/api/audio.js';
+import * as steamSearch from './functions/api/steam-search.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT) || 3000;
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch };
 
 // Secrets for local runs: environment variables, or a .dev.vars file (KEY=value per line, same as Cloudflare's tooling).
 const env = { ...process.env };

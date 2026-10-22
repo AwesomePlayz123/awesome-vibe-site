@@ -33,6 +33,19 @@ body { min-height: 100vh; background:
 .tabs a.on { background: var(--text); color: #111; }
 
 .search-opts { margin-top: 12px; }
+
+/* ---------- Steam game search suggestions ---------- */
+.ac { position: relative; flex: 1; min-width: 0; display: flex; }
+.ac input { width: 100%; }
+.suggestions { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20; list-style: none; margin: 0; padding: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,.45);
+  max-height: 420px; overflow-y: auto; }
+.suggestions li { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.suggestions li.active, .suggestions li:hover { background: rgba(255,255,255,.07); }
+.suggestions img { width: 92px; aspect-ratio: 231 / 87; object-fit: cover; border-radius: 4px; background: #000; display: block; }
+.sugg-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sugg-price { font: 12px var(--mono); color: var(--muted); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.sugg-price b { background: #4c6b22; color: #beee11; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
 a.brand { text-decoration: none; }
 a.brand:hover strong, a.brand:hover span { color: var(--text); }
 
@@ -199,6 +212,10 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
   .top { padding: 12px 16px; gap: 10px; }
   .brand > span:not(.dot) { display: none; }
   .tabs a { padding: 7px 10px; }
+  .suggestions li { grid-template-columns: 72px minmax(0, 1fr); }
+  .suggestions img { width: 72px; grid-row: span 2; }
+  .suggestions li { row-gap: 2px; }
+  .sugg-price { grid-column: 2; }
   .apps { grid-template-columns: repeat(4, 72px); gap: 26px 14px; }
   .cm-layout { grid-template-columns: 1fr; }
   .cm-preview-card { position: static; order: -1; }

@@ -4,7 +4,7 @@ Little tools that speed up YouTube editing. The home screen launches each tool: 
 
 ## Steam Kit
 
-Paste a Steam store link (or just the app id) and get everything you need for a video about that game:
+Type a game's name and pick it from the suggestions (like the Steam store's search box), or paste a Steam store link or app id. You get everything you need for a video about that game:
 
 - **Logo** – the transparent library logo, as a PNG.
 - **Cover & case** – the 600×900 library cover art, plus a game-case mockup (front or angled) exported as a transparent PNG.
@@ -69,6 +69,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 
 | Route | What it does |
 | --- | --- |
+| `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search, with capsule art and prices. |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
 | `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
@@ -79,7 +80,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, file.js, clipart.js, audio.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, steam-search.js, file.js, clipart.js, audio.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
 public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js, comments.js
