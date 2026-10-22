@@ -24,6 +24,16 @@
       <p>Logo, cover art and case mockup, the store info card, and trailers — ready to drop into your timeline.</p>
       <form id="lookup" class="lookup" autocomplete="off">
         <input id="url" name="url" type="text" placeholder="https://store.steampowered.com/app/548430/Deep_Rock_Galactic/" required />
+        <select id="region" aria-label="Store region (sets the currency)">
+          <option value="us">US $</option>
+          <option value="ca">Canada CDN$</option>
+          <option value="gb">UK £</option>
+          <option value="de">Germany €</option>
+          <option value="fr">France €</option>
+          <option value="au">Australia A$</option>
+          <option value="br">Brazil R$</option>
+          <option value="jp">Japan ¥</option>
+        </select>
         <button type="submit" id="go">Get assets</button>
       </form>
       <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -36,11 +46,22 @@
       </div>
 
       <div class="grid">
-        <article class="card" id="logoCard">
-          <header><h3>Logo</h3><span class="tag">Transparent PNG</span></header>
-          <div class="preview checker"><img id="logoImg" alt="Game logo" /></div>
-          <div class="actions"><a class="btn" id="logoDl">Download logo</a></div>
-        </article>
+        <div class="stack">
+          <article class="card" id="logoCard">
+            <header><h3>Logo</h3><span class="tag">Transparent PNG</span></header>
+            <div class="preview checker"><img id="logoImg" alt="Game logo" /></div>
+            <div class="actions"><a class="btn" id="logoDl">Download logo</a></div>
+          </article>
+
+          <article class="card" id="priceCard">
+            <header><h3>Price tag</h3><span class="tag" id="priceTag">3× PNG</span></header>
+            <div class="preview checker short"><canvas id="priceCanvas"></canvas></div>
+            <div class="actions">
+              <button class="btn" id="priceDl">Download price tag</button>
+              <label class="check"><input type="checkbox" id="priceBg" checked /> Background</label>
+            </div>
+          </article>
+        </div>
 
         <article class="card" id="infoCard">
           <header><h3>Store info card</h3><span class="tag">3× PNG</span></header>

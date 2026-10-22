@@ -6,7 +6,17 @@ const state = { game: null, caseStyle: 'front', images: {} };
 const proxied = (src) => `/api/file?src=${encodeURIComponent(src)}`;
 const proxiedDownload = (src, name) => `${proxied(src)}&download=${encodeURIComponent(name)}`;
 const extOf = (url) => (new URL(url).pathname.match(/\.(png|jpe?g|webp|gif)$/i)?.[1] || 'jpg').toLowerCase();
-const slug = (s) => String(s || 'game').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim();
+// Filename-safe version of a game/trailer name: plain dashes and quotes, no ™/®, accents dropped.
+const slug = (s) =>
+  String(s || 'game')
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[‐-―]/g, '-')
+    .replace(/[‘’]/g, "'")
+    .replace(/[™®©“”]/g, '')
+    .replace(/[\\/:*?"<>|]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim() || 'game';
 
 function setStatus(msg, isErr = false) {
   const el = $('#status');
@@ -72,13 +82,14 @@ $('#lookup').addEventListener('submit', async (e) => {
   $('#go').disabled = true;
   setStatus('Asking Steam…');
   try {
-    const res = await fetch(`/api/game?url=${encodeURIComponent(url)}`);
+    const cc = $('#region').value;
+    const res = await fetch(`/api/game?url=${encodeURIComponent(url)}&cc=${cc}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Something went wrong.');
     state.game = data;
     await render(data);
     setStatus('');
-    history.replaceState(null, '', `?app=${data.appid}`);
+    history.replaceState(null, '', `?app=${data.appid}${data.region !== 'us' ? `&cc=${data.region}` : ''}`);
   } catch (err) {
     setStatus(err.message, true);
   } finally {
@@ -102,13 +113,12 @@ async function render(g) {
 
   // Images needed for canvases
   state.images = {};
-  const [header, cover] = await Promise.all([
-    g.images.header ? loadImage(proxied(g.images.header)).catch(() => null) : null,
-    g.images.cover ? loadImage(proxied(g.images.cover)).catch(() => null) : null,
-  ]);
-  state.images = { header, cover: cover || header };
+  const load = (src) => (src ? loadImage(proxied(src)).catch(() => null) : null);
+  const [header, cover, capsule] = await Promise.all([load(g.images.header), load(g.images.cover), load(g.images.capsule)]);
+  state.images = { header, cover: cover || header, capsule: capsule || header };
 
   drawInfoCard();
+  drawPriceTag();
   drawCase();
   renderTrailers(g);
   renderExtras(g);
@@ -489,9 +499,145 @@ function renderExtras(g) {
   }
 }
 
-/* ---------------- Deep link: ?app=548430 ---------------- */
+/* ---------------- Price tag (Steam search / wishlist row) ---------------- */
 
-const preset = new URLSearchParams(location.search).get('app');
+const PRICE = {
+  bgLeft: '#1b2838',
+  bgRight: '#213245',
+  name: '#ffffff',
+  badgeBg: '#4c6b22',
+  badgeText: '#beee11',
+  priceBg: 'rgba(0, 0, 0, 0.25)',
+  original: '#738895',
+  final: '#ffffff',
+  muted: '#c6d4df',
+};
+
+function drawPriceTag() {
+  const g = state.game;
+  const canvas = $('#priceCanvas');
+  const cap = state.images.capsule;
+  const withBg = $('#priceBg').checked;
+  const S = 3;
+  const PAD = 10;
+  const CAP_H = 60;
+  const CAP_W = cap ? Math.round((CAP_H * cap.width) / cap.height) : 0;
+  const TEXT_X = PAD + CAP_W + (cap ? 16 : 0);
+  const NAME_MAX = 260;
+  const ROW_H = 28;
+
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = `600 17px ${STEAM.font}`;
+  let nameLines = wrapText(m, g.name, NAME_MAX);
+  if (nameLines.length > 2) {
+    let second = nameLines.slice(1).join(' ');
+    while (m.measureText(second + '…').width > NAME_MAX && second.length) second = second.slice(0, -1);
+    nameLines = [nameLines[0], second.trimEnd() + '…'];
+  }
+  const nameW = Math.max(...nameLines.map((l) => m.measureText(l).width));
+
+  // Measure the price row.
+  const p = g.price;
+  const discounted = p.state === 'paid' && p.discount > 0;
+  m.font = `700 18px ${STEAM.font}`;
+  const badgeText = discounted ? `-${p.discount}%` : '';
+  const badgeW = discounted ? m.measureText(badgeText).width + 16 : 0;
+  m.font = `12px ${STEAM.font}`;
+  const origW = discounted ? m.measureText(p.initial).width : 0;
+  m.font = `16px ${STEAM.font}`;
+  const finalText = p.state === 'paid' ? p.final : p.label;
+  const finalW = m.measureText(finalText).width;
+  const priceBoxW = (discounted ? origW + 8 : 0) + finalW + 20;
+  const rowW = badgeW + priceBoxW;
+
+  const NAME_LH = 21;
+  const blockH = nameLines.length * NAME_LH + 8 + ROW_H;
+  const H = Math.max(CAP_H, blockH) + PAD * 2;
+  const W = Math.ceil(TEXT_X + Math.max(nameW, rowW) + PAD + 8);
+
+  canvas.width = W * S;
+  canvas.height = H * S;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(S, S);
+  ctx.clearRect(0, 0, W, H);
+
+  if (withBg) {
+    const bg = ctx.createLinearGradient(0, 0, W, 0);
+    bg.addColorStop(0, PRICE.bgLeft);
+    bg.addColorStop(1, PRICE.bgRight);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  if (cap) ctx.drawImage(cap, PAD, (H - CAP_H) / 2, CAP_W, CAP_H);
+
+  let y = (H - blockH) / 2;
+  ctx.textBaseline = 'top';
+  ctx.font = `600 17px ${STEAM.font}`;
+  ctx.fillStyle = PRICE.name;
+  for (const line of nameLines) {
+    ctx.fillText(line, TEXT_X, y + 1);
+    y += NAME_LH;
+  }
+  y += 8;
+
+  let x = TEXT_X;
+  ctx.textBaseline = 'middle';
+  const mid = y + ROW_H / 2;
+  if (discounted) {
+    ctx.fillStyle = PRICE.badgeBg;
+    ctx.fillRect(x, y, badgeW, ROW_H);
+    ctx.font = `700 18px ${STEAM.font}`;
+    ctx.fillStyle = PRICE.badgeText;
+    ctx.fillText(badgeText, x + 8, mid + 1);
+    x += badgeW;
+  }
+  ctx.fillStyle = PRICE.priceBg;
+  ctx.fillRect(x, y, priceBoxW, ROW_H);
+  x += 10;
+  if (discounted) {
+    ctx.font = `12px ${STEAM.font}`;
+    ctx.fillStyle = PRICE.original;
+    ctx.fillText(p.initial, x, mid);
+    ctx.fillRect(x - 1, Math.round(mid) - 0.5, origW + 2, 1); // strikethrough
+    x += origW + 8;
+  }
+  ctx.font = `16px ${STEAM.font}`;
+  ctx.fillStyle = p.state === 'paid' ? PRICE.final : PRICE.muted;
+  ctx.fillText(finalText, x, mid + 1);
+
+  $('#priceTag').textContent = discounted ? `-${p.discount}% · 3× PNG` : '3× PNG';
+}
+
+$('#priceBg').addEventListener('change', () => state.game && drawPriceTag());
+
+$('#priceDl').addEventListener('click', () => {
+  if (!state.game) return;
+  const p = state.game.price;
+  const suffix = p.state === 'paid' && p.discount ? ` (-${p.discount}%)` : '';
+  saveCanvas($('#priceCanvas'), `${slug(state.game.name)} - Price${suffix}.png`);
+});
+
+/* ---------------- Region (currency) ---------------- */
+
+const regionSel = $('#region');
+try {
+  const saved = localStorage.getItem('steamkit.region');
+  if (saved && [...regionSel.options].some((o) => o.value === saved)) regionSel.value = saved;
+} catch {}
+regionSel.addEventListener('change', () => {
+  try {
+    localStorage.setItem('steamkit.region', regionSel.value);
+  } catch {}
+  if (state.game && $('#url').value.trim()) $('#lookup').requestSubmit();
+});
+
+/* ---------------- Deep link: ?app=548430[&cc=ca] ---------------- */
+
+const params = new URLSearchParams(location.search);
+const preset = params.get('app');
+const presetCc = params.get('cc');
+if (presetCc && [...regionSel.options].some((o) => o.value === presetCc)) regionSel.value = presetCc;
 if (preset) {
   $('#url').value = `https://store.steampowered.com/app/${preset}/`;
   $('#lookup').requestSubmit();

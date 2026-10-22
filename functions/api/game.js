@@ -3,7 +3,9 @@ import { getGame, parseAppId } from '../../lib/steam.js';
 import { json } from '../../lib/http.js';
 
 export async function onRequestGet({ request }) {
-  const url = new URL(request.url).searchParams.get('url');
+  const q = new URL(request.url).searchParams;
+  const url = q.get('url');
+  const cc = (q.get('cc') || 'us').toLowerCase();
   const appid = parseAppId(url);
   if (!appid) {
     return json(400, {
@@ -11,7 +13,7 @@ export async function onRequestGet({ request }) {
     });
   }
   try {
-    return json(200, await getGame(appid));
+    return json(200, await getGame(appid, cc));
   } catch (e) {
     return json(e.status || 502, { error: e.message || 'Could not reach Steam.' });
   }

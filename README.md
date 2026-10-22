@@ -10,10 +10,11 @@ Paste a Steam store link (or just the app id) and get everything you need for a 
 - **Cover & case** – the 600×900 library cover art, plus a game-case mockup (front or angled) exported as a transparent PNG.
 - **Store info card** – a recreation of the Steam store sidebar (header image, description, reviews, release date, developer, publisher), exported at 3× resolution. There's also a "Copy text" button.
 - **Trailers** – one-click MP4 download of each trailer at the best quality Steam offers.
+- **Price tag** – the Steam search-row look: capsule art, name, discount badge, struck-through original price and sale price (or Free / Coming Soon). Pick the store region to get that currency; turn the background off for a transparent PNG.
 - **More art** – library hero, store header, page background and every screenshot.
 
 Works with links like `https://store.steampowered.com/app/548430/Deep_Rock_Galactic/`, `steamcommunity.com/app/548430`, `steamdb.info/app/548430`, or `548430`.
-You can also link straight to a game with `?app=548430`.
+You can also link straight to a game with `?app=548430` (add `&cc=ca` for Canadian prices, etc.).
 
 ## Hosting on Cloudflare (free)
 
