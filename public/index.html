@@ -209,6 +209,11 @@
         <header><h3>Saved playlists</h3><span class="tag">this browser</span></header>
         <ul id="plList" class="pl-list"></ul>
         <p class="empty-note" id="plEmpty">Nothing saved yet. Load a playlist and hit <b>Save</b>.</p>
+        <div class="played">
+          <header><h3>Played so far</h3><button type="button" class="icon-btn played-clear" id="playedClear" title="Clear list" aria-label="Clear played list" hidden>✕</button></header>
+          <p class="empty-note" id="playedNote">Songs show up here as they play, with links to Spotify and YouTube. This list is just for this visit and isn't saved.</p>
+          <ul id="playedList" class="played-list"></ul>
+        </div>
       </aside>
       <article class="card pl-player">
         <header>

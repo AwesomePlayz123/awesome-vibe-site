@@ -128,6 +128,23 @@ a.brand:hover strong, a.brand:hover span { color: var(--text); }
 .pl-embed { min-height: 200px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: var(--bg); border: 1px solid var(--line); }
 .pl-embed iframe { width: 100%; height: 560px; border: 0; display: block; }
 .pl-tip { text-align: left; max-width: none; }
+.pl-embed > div, .pl-embed iframe { width: 100%; }
+.played { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.played > header { display: flex; justify-content: space-between; align-items: center; }
+.played h3 { margin: 0; font-size: 15px; }
+.played-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 520px; overflow-y: auto; }
+.played-item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; padding: 6px; border-radius: 10px; }
+.played-item.now { background: var(--panel-2); outline: 1px solid var(--line); }
+.played-item img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; }
+.played-info { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.played-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.played-now { font: 11px var(--mono); color: #1db954; text-transform: uppercase; letter-spacing: .05em; }
+.played-links { display: flex; gap: 6px; }
+.chip { font: 600 12px var(--font); text-decoration: none; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--text); background: var(--panel-2); }
+.chip:hover { border-color: #3a4150; }
+.chip-spotify::before { content: "● "; color: #1db954; }
+.chip-yt::before { content: "▶ "; color: #ff3b3b; font-size: 10px; }
+.chip[aria-disabled="true"] { opacity: .4; pointer-events: none; }
 
 .clip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .clip { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }

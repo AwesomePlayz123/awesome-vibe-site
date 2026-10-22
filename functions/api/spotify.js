@@ -1,12 +1,12 @@
-// GET /api/spotify?url=<open.spotify.com playlist/album link>
+// GET /api/spotify?url=<open.spotify.com playlist/album/track link>
 // Looks up the title and cover of a Spotify playlist or album via Spotify's public oEmbed endpoint,
 // so saved playlists get a proper name and thumbnail. No key needed.
 import { json, cachedJson } from '../../lib/http.js';
 
 export async function onRequestGet({ request }) {
   const src = new URL(request.url).searchParams.get('url') || '';
-  const m = src.match(/^https:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(playlist|album)\/([A-Za-z0-9]{10,40})/);
-  if (!m) return json(400, { error: 'Not a Spotify playlist or album link.' });
+  const m = src.match(/^https:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(playlist|album|track)\/([A-Za-z0-9]{10,40})/);
+  if (!m) return json(400, { error: 'Not a Spotify playlist, album or track link.' });
   const canonical = `https://open.spotify.com/${m[1]}/${m[2]}`;
   try {
     const data = await cachedJson(`spotify-oembed:${canonical}`, async () => {

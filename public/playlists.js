@@ -47,16 +47,160 @@ async function lookupInfo(p) {
   }
 }
 
-function showPlayer(p) {
-  current = p;
+/* ---------------- Spotify player (official iFrame API) ---------------- */
+// The iFrame API tells us which song is playing, so we can build a "Played so far" list.
+// If the API script can't load, we fall back to the plain embed (player works, no list).
+let controller = null;
+let apiPromise = null;
+
+function loadIframeApi() {
+  if (!apiPromise) {
+    apiPromise = new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(null), 6000);
+      window.onSpotifyIframeApiReady = (api) => {
+        clearTimeout(timer);
+        resolve(api);
+      };
+      const s = document.createElement('script');
+      s.src = 'https://open.spotify.com/embed/iframe-api/v1';
+      s.async = true;
+      s.onerror = () => {
+        clearTimeout(timer);
+        resolve(null);
+      };
+      document.head.appendChild(s);
+    });
+  }
+  return apiPromise;
+}
+
+function plainEmbed(p) {
   const box = $('#plEmbed');
   box.innerHTML = '';
   const iframe = document.createElement('iframe');
   iframe.src = `https://open.spotify.com/embed/${p.type}/${p.id}?utm_source=generator&theme=0`;
   iframe.title = p.name || 'Spotify player';
-  iframe.loading = 'lazy';
   iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
   box.appendChild(iframe);
+}
+
+async function mountPlayer(p) {
+  const uri = `spotify:${p.type}:${p.id}`;
+  if (controller) {
+    controller.loadUri(uri);
+    return;
+  }
+  const api = await loadIframeApi();
+  if (current !== p) return; // user switched playlists while the API loaded
+  if (!api) {
+    plainEmbed(p);
+    $('#playedNote').textContent = 'Spotify’s player API didn’t load, so songs can’t be listed here right now.';
+    return;
+  }
+  const box = $('#plEmbed');
+  box.innerHTML = '';
+  const el = document.createElement('div');
+  box.appendChild(el);
+  api.createController(el, { uri, width: '100%', height: window.innerWidth < 820 ? 460 : 560 }, (ctrl) => {
+    controller = ctrl;
+    ctrl.addListener('playback_update', (e) => onPlayback(e.data));
+  });
+}
+
+/* ---------------- Played so far (this session only, not saved) ---------------- */
+
+const played = []; // { id, title, thumb }
+let nowPlaying = null;
+
+function onPlayback(data) {
+  const m = String(data?.playingURI || '').match(/^spotify:track:([A-Za-z0-9]+)$/);
+  if (!m) return;
+  const id = m[1];
+  if (id !== nowPlaying) {
+    nowPlaying = id;
+    if (!played.some((t) => t.id === id)) {
+      const t = { id, title: null, thumb: null };
+      played.unshift(t);
+      lookupTrack(t);
+    }
+    renderPlayed();
+  }
+}
+
+async function lookupTrack(t) {
+  try {
+    const res = await fetch(`/api/spotify?url=${encodeURIComponent(`https://open.spotify.com/track/${t.id}`)}`);
+    if (res.ok) {
+      const info = await res.json();
+      t.title = info.title;
+      t.thumb = info.thumbnail;
+    }
+  } catch {}
+  if (!t.title) t.title = 'Unknown song';
+  renderPlayed();
+}
+
+function renderPlayed() {
+  const ul = $('#playedList');
+  ul.innerHTML = '';
+  $('#playedNote').hidden = played.length > 0;
+  $('#playedClear').hidden = played.length === 0;
+  for (const t of played) {
+    const li = document.createElement('li');
+    li.className = 'played-item' + (t.id === nowPlaying ? ' now' : '');
+    if (t.thumb) {
+      const img = document.createElement('img');
+      img.src = t.thumb;
+      img.alt = '';
+      li.appendChild(img);
+    } else {
+      const ph = document.createElement('span');
+      ph.className = 'pl-thumb-ph';
+      ph.textContent = '♪';
+      li.appendChild(ph);
+    }
+    const info = document.createElement('div');
+    info.className = 'played-info';
+    const title = document.createElement('div');
+    title.className = 'played-title';
+    title.textContent = t.title || 'Loading…';
+    info.appendChild(title);
+    if (t.id === nowPlaying) {
+      const tag = document.createElement('div');
+      tag.className = 'played-now';
+      tag.textContent = 'Now playing';
+      info.appendChild(tag);
+    }
+    const links = document.createElement('div');
+    links.className = 'played-links';
+    const sp = document.createElement('a');
+    sp.className = 'chip chip-spotify';
+    sp.href = `https://open.spotify.com/track/${t.id}`;
+    sp.target = '_blank';
+    sp.rel = 'noopener';
+    sp.textContent = 'Spotify';
+    const yt = document.createElement('a');
+    yt.className = 'chip chip-yt';
+    yt.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(t.title || '')}`;
+    yt.target = '_blank';
+    yt.rel = 'noopener';
+    yt.textContent = 'YouTube';
+    if (!t.title) yt.setAttribute('aria-disabled', 'true');
+    links.append(sp, yt);
+    info.appendChild(links);
+    li.appendChild(info);
+    ul.appendChild(li);
+  }
+}
+
+$('#playedClear').addEventListener('click', () => {
+  played.length = 0;
+  renderPlayed();
+});
+
+function showPlayer(p) {
+  current = p;
+  mountPlayer(p);
   $('#plTitle').textContent = p.name || (p.type === 'album' ? 'Album' : 'Playlist');
   $('#plOpen').href = linkFor(p);
   $('#plOpen').hidden = false;
