@@ -11,8 +11,5 @@
   },
   "engines": {
     "node": ">=18.17"
-  },
-  "optionalDependencies": {
-    "ffmpeg-static": "^5.2.0"
   }
 }

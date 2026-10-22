@@ -1,7 +1,9 @@
+import { buildTrailerMp4 } from './trailer.js';
+
 const $ = (sel) => document.querySelector(sel);
 const state = { game: null, caseStyle: 'front', images: {} };
 
-const proxied = (src) => `/api/image?src=${encodeURIComponent(src)}`;
+const proxied = (src) => `/api/file?src=${encodeURIComponent(src)}`;
 const proxiedDownload = (src, name) => `${proxied(src)}&download=${encodeURIComponent(name)}`;
 const extOf = (url) => (new URL(url).pathname.match(/\.(png|jpe?g|webp|gif)$/i)?.[1] || 'jpg').toLowerCase();
 const slug = (s) => String(s || 'game').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, ' ').trim();
@@ -442,30 +444,12 @@ function renderTrailers(g) {
 
 async function downloadTrailer(t, btn, meta) {
   const filename = `${slug(state.game.name)} - ${slug(t.name)}`;
-  const src = t.hls || t.mp4;
   btn.disabled = true;
   meta.className = 't-meta';
-  meta.textContent = t.hls ? 'Converting with ffmpeg… (usually 10–60s)' : 'Starting download…';
+  meta.textContent = 'Starting…';
   try {
-    const res = await fetch(`/api/trailer?src=${encodeURIComponent(src)}&name=${encodeURIComponent(filename)}`);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `Failed (${res.status})`);
-    }
-    const total = Number(res.headers.get('content-length')) || 0;
-    const reader = res.body.getReader();
-    const chunks = [];
-    let got = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      got += value.length;
-      meta.textContent = total
-        ? `Downloading ${Math.round((got / total) * 100)}% · ${(total / 1e6).toFixed(1)} MB`
-        : `Downloading ${(got / 1e6).toFixed(1)} MB`;
-    }
-    saveBlob(new Blob(chunks, { type: 'video/mp4' }), `${filename}.mp4`);
+    const blob = await buildTrailerMp4(t, (msg) => (meta.textContent = msg));
+    saveBlob(blob, `${filename}.mp4`);
     meta.className = 't-meta ok';
     meta.textContent = `Saved ${filename}.mp4`;
   } catch (e) {

@@ -13,35 +13,45 @@ Paste a Steam store link (or just the app id) and get everything you need for a 
 - **More art** – library hero, store header, page background and every screenshot.
 
 Works with links like `https://store.steampowered.com/app/548430/Deep_Rock_Galactic/`, `steamcommunity.com/app/548430`, `steamdb.info/app/548430`, or `548430`.
-You can also open `http://localhost:3000/?app=548430` directly.
+You can also link straight to a game with `?app=548430`.
 
-### Run it
+## Hosting on Cloudflare Pages (free)
 
-You need [Node.js](https://nodejs.org/) 18.17 or newer.
+1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) and open **Workers & Pages**.
+2. **Create application → Pages → Connect to Git**, sign in with GitHub and pick this repo.
+3. Build settings:
+   - Framework preset: **None**
+   - Build command: *(leave empty)*
+   - Build output directory: **`public`**
+4. **Save and Deploy**. You'll get a `*.pages.dev` link, and every push to `main` redeploys automatically.
+
+Cloudflare picks up the `functions/` folder on its own — no extra setup.
+
+## Running it on your own computer
+
+You need [Node.js](https://nodejs.org/) 18.17 or newer. There's nothing to install:
 
 ```bash
-npm install
 npm start
 ```
 
-Then open http://localhost:3000.
+Then open http://localhost:3000. The local server runs the exact same `functions/` code as Cloudflare.
 
-`npm install` pulls in a bundled copy of ffmpeg (`ffmpeg-static`), which is used to turn Steam's trailer streams into normal MP4 files — the video is copied, not re-encoded, so it's fast and lossless. If that install fails, install ffmpeg yourself and make sure `ffmpeg` is on your PATH.
-
-### How it works
+## How it works
 
 | Route | What it does |
 | --- | --- |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
-| `GET /api/image?src=…&download=…` | Proxies images from Steam's CDN so the page can draw them on a canvas and save them with tidy filenames. |
-| `GET /api/trailer?src=…&name=…` | Remuxes a trailer's HLS stream to MP4 with ffmpeg and sends it back. |
+| `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments) so the page can use them and save them with tidy names. Only Steam CDN URLs are accepted. |
 
-The proxies only accept Steam CDN URLs.
+**Trailers** are converted in your browser. Steam streams trailers in small pieces (HLS) rather than offering one file, so `public/trailer.js` picks the highest-quality H.264 stream, downloads its pieces, and uses [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) to join video and audio into one MP4 — a straight copy, no re-encoding. The first trailer you download also loads the converter (~30 MB, from jsDelivr), after which the browser caches it.
 
-### Project layout
+## Project layout
 
 ```
-server.js         tiny Node HTTP server (no framework)
-lib/steam.js      everything that talks to Steam
-public/           the page: index.html, styles.css, app.js (canvas rendering lives here)
+functions/api/    Cloudflare Pages Functions (game.js, file.js)
+lib/              shared code: steam.js talks to Steam, http.js has small response helpers
+public/           the page: index.html, styles.css, app.js (canvas rendering), trailer.js
+public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
+server.js         local dev server that mimics Cloudflare Pages
 ```
