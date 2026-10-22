@@ -109,7 +109,7 @@ async function mountPlayer(p) {
 
 /* ---------------- Played so far (this session only, not saved) ---------------- */
 
-const played = []; // { id, title, thumb }
+const played = []; // { id, title, artist, thumb }
 let nowPlaying = null;
 
 function onPlayback(data) {
@@ -119,7 +119,7 @@ function onPlayback(data) {
   if (id !== nowPlaying) {
     nowPlaying = id;
     if (!played.some((t) => t.id === id)) {
-      const t = { id, title: null, thumb: null };
+      const t = { id, title: null, artist: null, thumb: null };
       played.unshift(t);
       lookupTrack(t);
     }
@@ -133,6 +133,7 @@ async function lookupTrack(t) {
     if (res.ok) {
       const info = await res.json();
       t.title = info.title;
+      t.artist = info.artist || null;
       t.thumb = info.thumbnail;
     }
   } catch {}
@@ -148,15 +149,16 @@ function renderPlayed() {
   for (const t of played) {
     const li = document.createElement('li');
     li.className = 'played-item' + (t.id === nowPlaying ? ' now' : '');
+    const ph = document.createElement('span');
+    ph.className = 'pl-thumb-ph';
+    ph.textContent = '♪';
     if (t.thumb) {
       const img = document.createElement('img');
       img.src = t.thumb;
       img.alt = '';
+      img.onerror = () => img.replaceWith(ph);
       li.appendChild(img);
     } else {
-      const ph = document.createElement('span');
-      ph.className = 'pl-thumb-ph';
-      ph.textContent = '♪';
       li.appendChild(ph);
     }
     const info = document.createElement('div');
@@ -165,6 +167,12 @@ function renderPlayed() {
     title.className = 'played-title';
     title.textContent = t.title || 'Loading…';
     info.appendChild(title);
+    if (t.artist) {
+      const artist = document.createElement('div');
+      artist.className = 'played-artist';
+      artist.textContent = t.artist;
+      info.appendChild(artist);
+    }
     if (t.id === nowPlaying) {
       const tag = document.createElement('div');
       tag.className = 'played-now';
@@ -181,7 +189,7 @@ function renderPlayed() {
     sp.textContent = 'Spotify';
     const yt = document.createElement('a');
     yt.className = 'chip chip-yt';
-    yt.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(t.title || '')}`;
+    yt.href = `https://www.youtube.com/results?search_query=${encodeURIComponent([t.title, t.artist].filter(Boolean).join(' '))}`;
     yt.target = '_blank';
     yt.rel = 'noopener';
     yt.textContent = 'YouTube';
