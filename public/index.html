@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>awesome-vibe-site</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -17,6 +20,7 @@
       <a href="#steam" data-view="steam">Steam Kit</a>
       <a href="#clipart" data-view="clipart">Clipart</a>
       <a href="#audio" data-view="audio">Audio</a>
+      <a href="#comments" data-view="comments">Comments</a>
     </nav>
   </header>
 
@@ -43,6 +47,12 @@
             <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M10 21v6"/><path d="M16 15v18"/><path d="M22 10v28"/><path d="M28 17v14"/><path d="M34 13v22"/><path d="M40 20v8"/></g></svg>
           </span>
           <span class="app-name">Audio</span>
+        </a>
+        <a class="app" href="#comments">
+          <span class="app-icon i-comments">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 11h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H22l-7.5 6.2c-.8.7-2 .1-2-1V34H12a5 5 0 0 1-5-5V16a5 5 0 0 1 5-5z" fill="#fff"/><path d="M24 29.5s-6-3.6-6-7.6a3.3 3.3 0 0 1 6-1.9 3.3 3.3 0 0 1 6 1.9c0 4-6 7.6-6 7.6z" fill="#e8366b"/></svg>
+          </span>
+          <span class="app-name">Comments</span>
         </a>
       </div>
     </section>
@@ -186,11 +196,73 @@
     </section>
     <audio id="player" preload="none"></audio>
    </div>
+   <div class="view" id="view-comments" hidden>
+    <section class="hero hero-tight">
+      <h1>Comment cards.</h1>
+      <p>Recreate a viewer comment as a clean overlay for your video.</p>
+    </section>
+    <div class="cm-layout">
+      <form id="cmForm" class="card cm-form" autocomplete="off">
+        <div class="cm-row">
+          <div class="seg seg-lg" id="cmPlatform" aria-label="Platform">
+            <button type="button" data-v="youtube" class="on">YouTube</button>
+            <button type="button" data-v="instagram">Instagram</button>
+            <button type="button" data-v="tiktok">TikTok</button>
+          </div>
+          <div class="seg seg-lg" id="cmTheme" aria-label="Theme">
+            <button type="button" data-v="light" class="on">Light</button>
+            <button type="button" data-v="dark">Dark</button>
+          </div>
+        </div>
+
+        <label class="field"><span>Username</span><input id="cmName" type="text" value="UltraHazard" maxlength="60" /></label>
+        <label class="field"><span>Comment</span><textarea id="cmText" rows="4" maxlength="2000">Firewatch</textarea></label>
+        <div class="cm-row">
+          <label class="field"><span>Posted</span><input id="cmTime" type="text" value="14 hours ago" maxlength="30" /></label>
+          <label class="field"><span>Likes</span><input id="cmLikes" type="text" value="2" maxlength="12" /></label>
+        </div>
+
+        <div class="field">
+          <span>Avatar</span>
+          <div class="cm-avatar-row">
+            <canvas id="cmAvatarThumb" width="80" height="80" aria-hidden="true"></canvas>
+            <label class="btn ghost file-btn">Upload image<input id="cmAvatar" type="file" accept="image/*" /></label>
+            <button type="button" class="btn ghost" id="cmAvatarClear" hidden>Remove</button>
+          </div>
+        </div>
+
+        <div class="cm-checks">
+          <label class="check"><input type="checkbox" id="cmHeart" checked /> Liked by creator</label>
+          <label class="check"><input type="checkbox" id="cmVerified" /> Verified badge</label>
+          <label class="check"><input type="checkbox" id="cmBg" checked /> Card background</label>
+        </div>
+
+        <div class="field" id="cmCreatorField">
+          <span>Your avatar <em>(for the creator heart, remembered)</em></span>
+          <div class="cm-avatar-row">
+            <canvas id="cmCreatorThumb" width="80" height="80" aria-hidden="true"></canvas>
+            <label class="btn ghost file-btn">Upload image<input id="cmCreator" type="file" accept="image/*" /></label>
+            <button type="button" class="btn ghost" id="cmCreatorClear" hidden>Remove</button>
+          </div>
+        </div>
+      </form>
+
+      <article class="card cm-preview-card">
+        <header><h3>Preview</h3><span class="tag">3× PNG</span></header>
+        <div class="preview checker cm-preview"><canvas id="cmCanvas"></canvas></div>
+        <div class="actions">
+          <button class="btn" id="cmDl" type="button">Download PNG</button>
+          <button class="btn ghost" id="cmCopy" type="button">Copy image</button>
+        </div>
+      </article>
+    </div>
+   </div>
   </main>
 
   <script src="/nav.js" type="module"></script>
   <script src="/app.js" type="module"></script>
   <script src="/clipart.js" type="module"></script>
   <script src="/audio.js" type="module"></script>
+  <script src="/comments.js" type="module"></script>
 </body>
 </html>

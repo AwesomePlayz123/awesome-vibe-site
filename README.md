@@ -1,6 +1,6 @@
 # awesome-vibe-site
 
-Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder** and **Audio Finder**.
+Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder**, **Audio Finder** and **Comment Cards**.
 
 ## Steam Kit
 
@@ -42,6 +42,10 @@ It needs two more secrets, added the same way as the Pixabay one:
 | `FREESOUND_API_KEY` | freesound.org/apiv2/apply, the **Client secret/Api key** column |
 | `JAMENDO_CLIENT_ID` | devportal.jamendo.com, create an application, copy its **Client ID** |
 
+## Comment Cards
+
+Recreate a viewer comment as an overlay: pick **YouTube**, **Instagram** or **TikTok** and **Light** or **Dark**, then fill in the username, comment, time and likes. Optional: upload the commenter's avatar (otherwise a coloured initial is used), a verified badge, and "liked by creator" (your own avatar is remembered for the creator heart). Export a 3× PNG with or without the card background, or copy it straight to the clipboard. These are simplified recreations of each layout without platform logos. Everything runs in the browser; no keys needed.
+
 ## Hosting on Cloudflare (free)
 
 1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com), open **Workers & Pages** and choose **Create application**.
@@ -78,7 +82,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 functions/api/    the API handlers (game.js, file.js, clipart.js, audio.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js
+public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js, comments.js
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

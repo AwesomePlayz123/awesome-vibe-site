@@ -1,5 +1,5 @@
 // View switching: #home (default), #steam, #clipart, #audio.
-const TITLES = { home: 'Home', steam: 'Steam Kit', clipart: 'Clipart Finder', audio: 'Audio Finder' };
+const TITLES = { home: 'Home', steam: 'Steam Kit', clipart: 'Clipart Finder', audio: 'Audio Finder', comments: 'Comment Cards' };
 
 function currentView() {
   const h = location.hash.slice(1);
