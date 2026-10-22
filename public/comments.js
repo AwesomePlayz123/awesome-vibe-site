@@ -136,7 +136,7 @@ function read() {
   else name = name.replace(/^@/, '');
   return {
     name,
-    text: $('#cmText').value.replace(/\r/g, '') || ' ',
+    text: $('#cmText').value.replace(/\r/g, '') || 'Your comment here',
     time: $('#cmTime').value.trim(),
     likes: $('#cmLikes').value.trim(),
     heart: $('#cmHeart').checked,
