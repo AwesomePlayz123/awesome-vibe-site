@@ -71,8 +71,9 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 
 | Route | What it does |
 | --- | --- |
-| `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search, with capsule art and prices. |
-| `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
+| `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search (falls back to Valve's Web API search), with capsule art and prices. |
+| `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
+| `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
 | `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
 | `GET /api/spotify?url=…` | Gets a Spotify playlist's, album's or song's name and cover (Spotify's public oEmbed) for the saved and played lists. |
@@ -83,7 +84,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, steam-search.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
 public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js

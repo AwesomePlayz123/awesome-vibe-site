@@ -558,6 +558,7 @@ function renderTrailers(g) {
     const img = document.createElement('img');
     img.alt = '';
     img.loading = 'lazy';
+    img.onerror = () => (img.style.visibility = 'hidden');
     if (t.thumbnail) img.src = proxied(t.thumbnail);
 
     const info = document.createElement('div');
