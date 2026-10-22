@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Steam Kit · awesome-vibe-site</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>awesome-vibe-site</span>
+      <span class="sep">/</span>
+      <strong>Steam Kit</strong>
+    </div>
+    <span class="hint">Editing assets in one paste</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Paste a Steam link. Get the editing kit.</h1>
+      <p>Logo, cover art and case mockup, the store info card, and trailers — ready to drop into your timeline.</p>
+      <form id="lookup" class="lookup" autocomplete="off">
+        <input id="url" name="url" type="text" placeholder="https://store.steampowered.com/app/548430/Deep_Rock_Galactic/" required />
+        <button type="submit" id="go">Get assets</button>
+      </form>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" class="results" hidden>
+      <div class="game-title">
+        <h2 id="gameName"></h2>
+        <a id="storeLink" target="_blank" rel="noopener">Open on Steam ↗</a>
+      </div>
+
+      <div class="grid">
+        <article class="card" id="logoCard">
+          <header><h3>Logo</h3><span class="tag">Transparent PNG</span></header>
+          <div class="preview checker"><img id="logoImg" alt="Game logo" /></div>
+          <div class="actions"><a class="btn" id="logoDl">Download logo</a></div>
+        </article>
+
+        <article class="card" id="infoCard">
+          <header><h3>Store info card</h3><span class="tag">3× PNG</span></header>
+          <div class="preview dark"><canvas id="infoCanvas"></canvas></div>
+          <div class="actions">
+            <button class="btn" id="infoDl">Download info card</button>
+            <button class="btn ghost" id="infoCopy">Copy text</button>
+          </div>
+        </article>
+
+        <article class="card wide" id="coverCard">
+          <header>
+            <h3>Cover &amp; case</h3>
+            <div class="seg" role="tablist" aria-label="Case style">
+              <button type="button" data-style="front" class="on">Front</button>
+              <button type="button" data-style="angled">Angled</button>
+            </div>
+          </header>
+          <div class="pair">
+            <div class="preview dark"><img id="coverImg" alt="Cover art" /></div>
+            <div class="preview checker"><canvas id="caseCanvas"></canvas></div>
+          </div>
+          <div class="actions">
+            <a class="btn ghost" id="coverDl">Download cover art</a>
+            <button class="btn" id="caseDl">Download case PNG</button>
+          </div>
+        </article>
+
+        <article class="card wide" id="trailerCard">
+          <header><h3>Trailers</h3><span class="tag">MP4 · best quality</span></header>
+          <ul id="trailers" class="trailers"></ul>
+        </article>
+
+        <article class="card wide" id="extraCard">
+          <header><h3>More art</h3><span class="tag">Backgrounds &amp; screenshots</span></header>
+          <div id="extras" class="extras"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
