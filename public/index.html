@@ -9,17 +9,45 @@
 </head>
 <body>
   <header class="top">
-    <div class="brand">
+    <a class="brand" href="#home" aria-label="Home">
       <span class="dot"></span>
       <span>awesome-vibe-site</span>
-    </div>
+    </a>
     <nav class="tabs" aria-label="Tools">
-      <a href="#steam" data-view="steam" class="on">Steam Kit</a>
-      <a href="#clipart" data-view="clipart">Clipart Finder</a>
+      <a href="#steam" data-view="steam">Steam Kit</a>
+      <a href="#clipart" data-view="clipart">Clipart</a>
+      <a href="#audio" data-view="audio">Audio</a>
     </nav>
   </header>
 
   <main>
+   <div class="view" id="view-home">
+    <section class="home">
+      <p class="home-greet" id="greet">Hey there</p>
+      <h1 class="home-title">What are we editing today?</h1>
+      <div class="apps">
+        <a class="app" href="#steam">
+          <span class="app-icon i-steam">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 16h18a9 9 0 0 1 8.6 11.6l-2 6.6a4.4 4.4 0 0 1-7.6 1.5L28.6 32H19.4L16 35.7a4.4 4.4 0 0 1-7.6-1.5l-2-6.6A9 9 0 0 1 15 16z" fill="#fff"/><path d="M15 21v6M12 24h6" stroke="#2a5bd7" stroke-width="2.4" stroke-linecap="round"/><circle cx="31" cy="22" r="1.9" fill="#2a5bd7"/><circle cx="35" cy="26" r="1.9" fill="#2a5bd7"/></svg>
+          </span>
+          <span class="app-name">Steam Kit</span>
+        </a>
+        <a class="app" href="#clipart">
+          <span class="app-icon i-clip">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="11" width="30" height="26" rx="5" fill="#fff"/><circle cx="18" cy="19.5" r="3.2" fill="#ff5a5f"/><path d="M12 34l8.5-9 5.5 5.5 4-4 6 7.5z" fill="#ff8a3d"/></svg>
+          </span>
+          <span class="app-name">Clipart</span>
+        </a>
+        <a class="app" href="#audio">
+          <span class="app-icon i-audio">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><g stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M10 21v6"/><path d="M16 15v18"/><path d="M22 10v28"/><path d="M28 17v14"/><path d="M34 13v22"/><path d="M40 20v8"/></g></svg>
+          </span>
+          <span class="app-name">Audio</span>
+        </a>
+      </div>
+    </section>
+   </div>
+
    <div class="view" id="view-steam">
     <section class="hero">
       <h1>Paste a Steam link. Get the editing kit.</h1>
@@ -133,10 +161,36 @@
       </div>
     </section>
    </div>
+   <div class="view" id="view-audio" hidden>
+    <section class="hero">
+      <h1>Sound effects and music.</h1>
+      <p>Preview right here, download what you like. Sound effects are public domain; music needs a one-line credit, which you can copy.</p>
+      <form id="audioSearch" class="lookup" autocomplete="off">
+        <input id="audioQ" name="q" type="search" placeholder="e.g. explosion, coin pickup, chill lofi" required />
+        <div class="seg seg-lg" id="audioKind" role="tablist" aria-label="What to search">
+          <button type="button" data-kind="sfx" class="on">Sound FX</button>
+          <button type="button" data-kind="music">Music</button>
+        </div>
+        <button type="submit" id="audioGo">Search</button>
+      </form>
+      <p class="note" id="musicNote" hidden>Music tracks are free to use commercially with credit, but some artists also register tracks with YouTube Content ID, so a monetized video can still get a claim. For background music in monetized videos, YouTube Studio's Audio Library is the safest option.</p>
+      <div id="audioStatus" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="audioResults" hidden>
+      <ul id="audioList" class="audio-list"></ul>
+      <div class="clip-foot">
+        <button class="btn ghost" id="audioMore" hidden>Show 10 more</button>
+        <p class="credit" id="audioCredit"></p>
+      </div>
+    </section>
+    <audio id="player" preload="none"></audio>
+   </div>
   </main>
 
   <script src="/nav.js" type="module"></script>
   <script src="/app.js" type="module"></script>
   <script src="/clipart.js" type="module"></script>
+  <script src="/audio.js" type="module"></script>
 </body>
 </html>

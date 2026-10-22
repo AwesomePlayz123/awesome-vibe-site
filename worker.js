@@ -3,9 +3,10 @@
 import * as game from './functions/api/game.js';
 import * as file from './functions/api/file.js';
 import * as clipart from './functions/api/clipart.js';
+import * as audio from './functions/api/audio.js';
 import { json } from './lib/http.js';
 
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio };
 
 export default {
   async fetch(request, env) {

@@ -398,9 +398,9 @@ function drawCase() {
   ctx.drawImage(layer, 0, 0);
 }
 
-document.querySelectorAll('.seg button').forEach((b) =>
+document.querySelectorAll('#coverCard .seg button').forEach((b) =>
   b.addEventListener('click', () => {
-    document.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b));
+    document.querySelectorAll('#coverCard .seg button').forEach((x) => x.classList.toggle('on', x === b));
     state.caseStyle = b.dataset.style;
     if (state.game) drawCase();
   })

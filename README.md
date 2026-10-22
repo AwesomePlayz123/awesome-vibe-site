@@ -1,6 +1,6 @@
 # awesome-vibe-site
 
-Little tools that speed up YouTube editing. Two tabs so far: **Steam Kit** and **Clipart Finder**.
+Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder** and **Audio Finder**.
 
 ## Steam Kit
 
@@ -26,7 +26,21 @@ It needs a free Pixabay API key:
 2. In Cloudflare: your project → **Settings → Variables and Secrets → Add** → type **Secret**, name `PIXABAY_API_KEY`, paste the key, save.
 3. Redeploy (Deployments → ⋯ → Retry deployment) so the secret takes effect.
 
-For local runs, create a `.dev.vars` file next to `server.js` containing `PIXABAY_API_KEY=your-key` (it's git-ignored).
+For local runs, create a `.dev.vars` file next to `server.js` containing your keys, one per line, e.g. `PIXABAY_API_KEY=your-key` (it's git-ignored).
+
+## Audio Finder
+
+Search for **Sound FX** or **Music**, preview right on the page, and download.
+
+- **Sound FX** come from [Freesound](https://freesound.org/), public-domain (CC0) sounds only: free for commercial use, no credit needed. Downloads are Freesound's high-quality MP3 previews.
+- **Music** comes from [Jamendo](https://www.jamendo.com/). Only tracks whose Creative Commons license allows commercial use *and* use in a video are shown (no NC or ND licenses). These need credit: **Copy credit** gives you a line for your video description. Some tracks may still be registered with YouTube Content ID, so for monetized videos YouTube Studio's Audio Library is the safest option.
+
+It needs two more secrets, added the same way as the Pixabay one:
+
+| Secret | Where to get it |
+| --- | --- |
+| `FREESOUND_API_KEY` | freesound.org/apiv2/apply, the **Client secret/Api key** column |
+| `JAMENDO_CLIENT_ID` | devportal.jamendo.com, create an application, copy its **Client ID** |
 
 ## Hosting on Cloudflare (free)
 
@@ -52,18 +66,19 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | Route | What it does |
 | --- | --- |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). |
-| `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments) and Pixabay, so the page can use them and save them with tidy names. Only those hosts are accepted. |
+| `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
+| `GET /api/audio?q=…&kind=sfx\|music&offset=…` | Searches Freesound (CC0 only) or Jamendo (commercial + video-safe licenses only). Cached for 24 hours. |
 
 **Trailers** are converted in your browser. Steam streams trailers in small pieces (HLS) rather than offering one file, so `public/trailer.js` picks the highest-quality H.264 stream, downloads its pieces, and uses [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) to join video and audio into one MP4 — a straight copy, no re-encoding. The first trailer you download also loads the converter (~30 MB, from jsDelivr), after which the browser caches it.
 
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, file.js, clipart.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, file.js, clipart.js, audio.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, nav.js (tabs), app.js + trailer.js (Steam Kit), clipart.js
+public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```
