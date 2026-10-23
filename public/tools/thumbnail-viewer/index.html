@@ -18,7 +18,7 @@
   <main>
     <section class="hero">
       <h1>Thumbnail viewer</h1>
-      <p class="lede">See your thumbnail and title next to the top videos in your niche.</p>
+      <p class="lede">See your thumbnail and title in a YouTube grid next to the channels and videos you’re up against. No API key needed.</p>
     </section>
 
     <section class="panel controls">
@@ -48,7 +48,29 @@
             <input id="duration" type="text" maxlength="8" value="12:34" autocomplete="off">
           </div>
         </div>
-        <div class="two">
+        <div class="field">
+          <span class="label">Compare with</span>
+          <div class="seg" id="source" role="group" aria-label="Compare with">
+            <button type="button" data-s="links" aria-pressed="true">Videos &amp; channels</button>
+            <button type="button" data-s="niche" aria-pressed="false">Niche search (API key)</button>
+          </div>
+        </div>
+
+        <div id="linksBox" class="src-box">
+          <div class="field">
+            <label class="label" for="links">YouTube video or channel links, one per line</label>
+            <textarea id="links" rows="4" spellcheck="false" placeholder="https://www.youtube.com/@SomeCreator&#10;https://www.youtube.com/watch?v=…"></textarea>
+            <p class="hint">Channels add their most viewed recent uploads (Shorts skipped); videos are shown as-is. No API key needed.</p>
+          </div>
+          <div class="row">
+            <button type="button" class="btn primary small" id="loadLinks">Load videos</button>
+            <select id="lists" aria-label="Saved lists"></select>
+            <button type="button" class="btn small" id="saveList">Save list</button>
+            <button type="button" class="btn small" id="delList" hidden>Delete</button>
+          </div>
+        </div>
+
+        <div id="nicheBox" class="src-box" hidden>
           <div class="field">
             <label class="label" for="niche">Niche</label>
             <div class="row">
@@ -57,30 +79,31 @@
             </div>
             <input id="custom" type="text" placeholder="Search keyword, then press Enter" autocomplete="off" hidden>
           </div>
-          <div class="field">
-            <label class="label" for="pos">Your position</label>
+          <details class="key" id="keybox">
+            <summary>YouTube API key</summary>
+            <p class="hint">Niche search finds the most viewed videos in a niche, which only YouTube’s API can do. Free, stored only in this browser.</p>
             <div class="row">
-              <select id="pos"></select>
-              <button type="button" class="btn small" id="shuffle">Shuffle</button>
+              <input id="key" type="password" placeholder="Paste your API key" autocomplete="off" spellcheck="false">
+              <button type="button" class="btn small" id="savekey">Save</button>
             </div>
+            <ol class="steps">
+              <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> and create a project.</li>
+              <li>Go to <b>APIs &amp; Services → Library</b>, find <b>YouTube Data API v3</b>, and click Enable.</li>
+              <li>Go to <b>Credentials → Create credentials → API key</b>.</li>
+              <li>Edit the key: under <b>Application restrictions</b> pick <b>Websites</b> and add your site's address, and under <b>API restrictions</b> pick YouTube Data API v3. This stops others from using your key.</li>
+            </ol>
+          </details>
+        </div>
+
+        <div class="field">
+          <label class="label" for="pos">Your position</label>
+          <div class="row">
+            <select id="pos"></select>
+            <button type="button" class="btn small" id="shuffle">Shuffle</button>
           </div>
         </div>
         <label class="check"><input type="checkbox" id="hl"> Highlight my video</label>
 
-        <details class="key" id="keybox">
-          <summary>YouTube API key</summary>
-          <p class="hint">Needed to load the top videos. Free, stored only in this browser.</p>
-          <div class="row">
-            <input id="key" type="password" placeholder="Paste your API key" autocomplete="off" spellcheck="false">
-            <button type="button" class="btn small" id="savekey">Save</button>
-          </div>
-          <ol class="steps">
-            <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> and create a project.</li>
-            <li>Go to <b>APIs &amp; Services → Library</b>, find <b>YouTube Data API v3</b>, and click Enable.</li>
-            <li>Go to <b>Credentials → Create credentials → API key</b>.</li>
-            <li>Edit the key: under <b>Application restrictions</b> pick <b>Websites</b> and add your site's address, and under <b>API restrictions</b> pick YouTube Data API v3. This stops others from using your key.</li>
-          </ol>
-        </details>
       </div>
     </section>
 

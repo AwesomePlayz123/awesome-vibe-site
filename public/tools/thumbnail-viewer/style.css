@@ -78,3 +78,10 @@
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .loading .skel * { animation: none !important; } }
+
+.src-box { display: flex; flex-direction: column; gap: 12px; }
+.src-box .row { flex-wrap: wrap; }
+.src-box .row select { flex: 1; min-width: 140px; }
+#source { display: flex; }
+#source button { flex: 1; }
+.st:empty { display: none; }

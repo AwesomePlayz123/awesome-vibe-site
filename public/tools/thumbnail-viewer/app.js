@@ -98,8 +98,9 @@
     for (let i = 0; i < 8; i++) {
       const c = comps[i];
       slots.push(c ? videoCard({
-        thumb: c.thumb, fallback: c.fallback, dur: fmtDur(c.dur), title: c.title, channel: c.channel,
-        avatar: c.avatar, stats: fmtViews(c.views) + ' · ' + fmtAgo(c.published),
+        thumb: c.thumb, fallback: c.fallback, dur: c.dur ? fmtDur(c.dur) : '', title: c.title, channel: c.channel,
+        avatar: c.avatar,
+        stats: [c.views != null ? fmtViews(c.views) : null, c.published ? fmtAgo(c.published) : null].filter(Boolean).join(' · '),
       }) : skeleton());
     }
     const title = $('title').value.trim();
@@ -167,8 +168,9 @@
   }
 
   async function load(force) {
+    if (source === 'links') return loadLinks();
     const query = currentQuery();
-    if (!getKey()) { loadState = 'nokey'; comps = []; msg('Add a YouTube API key to load the top videos in this niche.'); render(); return; }
+    if (!getKey()) { loadState = 'nokey'; comps = []; msg('Niche search needs a YouTube API key (below). Or switch to Videos & channels, which works without one.'); render(); return; }
     if (!query) { loadState = 'nokey'; comps = []; msg('Type a keyword and press Enter.'); render(); return; }
 
     const cacheKey = 'tv-cache:' + query.toLowerCase();
@@ -197,6 +199,107 @@
     }
     render();
   }
+
+  // ---- keyless: videos & channels you paste (YouTube oEmbed + channel RSS via this site's /api/youtube) ----
+  const store = {
+    get: (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
+  let source = store.get('tv-source', 'links') === 'niche' ? 'niche' : 'links';
+
+  function pickComps(items) {
+    const seen = new Set();
+    const videos = items.filter((x) => x.from === 'video');
+    const fromChannels = items.filter((x) => x.from !== 'video').sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
+    const out = [];
+    for (const x of [...videos, ...fromChannels]) {
+      if (seen.has(x.id)) continue;
+      seen.add(x.id);
+      out.push(x);
+      if (out.length === 8) break;
+    }
+    return out;
+  }
+
+  async function loadLinks() {
+    const text = $('links').value.trim();
+    store.set('tv-links', $('links').value);
+    if (!text) { loadState = 'nokey'; comps = []; msg('Paste some YouTube channel or video links to compare against, then press Load videos.'); render(); return; }
+    const id = ++reqId;
+    loadState = 'loading'; comps = []; msg('Loading videos…'); render();
+    $('loadLinks').disabled = true;
+    try {
+      const res = await fetch('/api/youtube?links=' + encodeURIComponent(text));
+      const data = await res.json().catch(() => ({}));
+      if (id !== reqId) return;
+      if (!res.ok) throw new Error(data.error || 'Could not load videos.');
+      comps = pickComps(data.items || []);
+      loadState = 'ready';
+      const failed = (data.sources || []).filter((x) => x.error);
+      let text2 = comps.length
+        ? `Showing ${comps.length} video${comps.length === 1 ? '' : 's'}${comps.length < 8 ? ' (add more links to fill the grid)' : ''}.`
+        : 'No long-form videos found in those links.';
+      if (failed.length) text2 += ' Couldn’t load: ' + failed.map((f) => `${f.line} (${f.error})`).join('; ') + '.';
+      msg(text2, !comps.length || failed.length > 0);
+    } catch (e) {
+      if (id !== reqId) return;
+      loadState = 'error'; comps = [];
+      msg(e.message, true);
+    } finally {
+      $('loadLinks').disabled = false;
+    }
+    render();
+  }
+
+  function setSource(s, reload) {
+    source = s;
+    store.set('tv-source', s);
+    document.querySelectorAll('#source button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === s)));
+    $('linksBox').hidden = s !== 'links';
+    $('nicheBox').hidden = s !== 'niche';
+    if (s === 'niche' && !getKey()) $('keybox').open = true;
+    if (reload) load(false);
+  }
+  document.querySelectorAll('#source button').forEach((b) => b.addEventListener('click', () => { if (b.dataset.s !== source) setSource(b.dataset.s, true); }));
+  $('loadLinks').addEventListener('click', () => loadLinks());
+  $('links').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); loadLinks(); } });
+
+  // Saved lists ("niches" of your own), kept in this browser
+  function renderLists(selected) {
+    const lists = store.get('tv-lists', []);
+    const sel = $('lists');
+    sel.replaceChildren(new Option(lists.length ? 'Saved lists…' : 'No saved lists yet', ''));
+    lists.forEach((l, i) => sel.append(new Option(l.name, String(i))));
+    sel.value = selected != null ? String(selected) : '';
+    $('delList').hidden = sel.value === '';
+  }
+  $('lists').addEventListener('change', () => {
+    const lists = store.get('tv-lists', []);
+    const l = lists[+$('lists').value];
+    $('delList').hidden = !l;
+    if (l) { $('links').value = l.links; loadLinks(); }
+  });
+  $('saveList').addEventListener('click', () => {
+    const links = $('links').value.trim();
+    if (!links) { msg('Paste some links first, then save them as a list.', true); return; }
+    const lists = store.get('tv-lists', []);
+    const current = lists[+$('lists').value];
+    const name = (prompt('Name this list (e.g. "Minecraft channels"):', current ? current.name : '') || '').trim();
+    if (!name) return;
+    const i = lists.findIndex((l) => l.name.toLowerCase() === name.toLowerCase());
+    if (i >= 0) lists[i] = { name, links }; else lists.push({ name, links });
+    store.set('tv-lists', lists);
+    renderLists(i >= 0 ? i : lists.length - 1);
+    msg(`Saved "${name}".`);
+  });
+  $('delList').addEventListener('click', () => {
+    const lists = store.get('tv-lists', []);
+    const i = +$('lists').value;
+    if (!lists[i] || !confirm(`Delete the list "${lists[i].name}"?`)) return;
+    lists.splice(i, 1);
+    store.set('tv-lists', lists);
+    renderLists();
+  });
 
   // ---- thumbnail upload ----
   function setImage(file) {
@@ -261,7 +364,9 @@
   $('t-dark').addEventListener('click', () => setTheme(true));
   $('t-light').addEventListener('click', () => setTheme(false));
 
-  if (!getKey()) $('keybox').open = true;
+  $('links').value = store.get('tv-links', '');
+  renderLists();
+  setSource(source, false);
   render();
   load(false);
 })();

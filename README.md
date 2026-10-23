@@ -31,7 +31,10 @@ All Steam and SteamGridDB lookups go through this site's own `/api/proxy`, so no
 
 ## Thumbnail Viewer
 
-Upload a thumbnail and title and see them in a YouTube-style grid next to the top videos in your niche. Loading those videos needs a free YouTube Data API key, which you paste into the page (stored in your browser); the page has step-by-step instructions.
+Upload a thumbnail and title and see them in a YouTube-style grid next to other videos.
+
+- **Videos & channels** (default, no key): paste YouTube video and/or channel links. Channels contribute their most viewed recent uploads from YouTube's public RSS feed (latest 15, Shorts skipped); videos come from YouTube's public oEmbed. Save link lists by name to reload them later (stored in your browser).
+- **Niche search** (optional): the most viewed videos in a niche over the last 30 days. Only YouTube's Data API can search, so this mode needs a free API key pasted into the page.
 
 ## Clipart Finder
 
@@ -95,6 +98,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search (falls back to Valve's Web API search), with capsule art and prices. |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
 | `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
+| `GET /api/youtube?links=…` | Keyless video data for the Thumbnail Viewer: YouTube oEmbed for videos, channel RSS feeds for uploads, channel names and avatars from the channel page's link-preview tags. |
 | `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
 | `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
@@ -106,7 +110,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, proxy.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, proxy.js, youtube.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
 public/           the page: index.html, styles.css, nav.css + site-header.js (shared navbar), nav.js (views), folder.js (Steam folder), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js, png.js
