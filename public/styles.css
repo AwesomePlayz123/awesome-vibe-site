@@ -53,7 +53,7 @@ a.brand:hover strong, a.brand:hover span { color: var(--text); }
 .home { min-height: calc(100vh - 160px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 0; }
 .home-greet { margin: 0 0 6px; color: var(--muted); font-size: 15px; }
 .home-title { margin: 0 0 48px; font-size: clamp(26px, 4vw, 40px); letter-spacing: -0.02em; }
-.apps { display: grid; grid-template-columns: repeat(4, 120px); gap: 34px 40px; justify-content: center; }
+.apps { display: grid; grid-template-columns: repeat(5, 120px); gap: 34px 40px; justify-content: center; }
 .app { display: flex; flex-direction: column; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
 .app-icon { width: 96px; height: 96px; border-radius: 26px; display: grid; place-items: center; position: relative; overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .18s ease, box-shadow .18s ease; }
@@ -68,6 +68,28 @@ a.brand:hover strong, a.brand:hover span { color: var(--text); }
 .i-clip { background: linear-gradient(145deg, #ffb347, #ff6a3d 55%, #e8366b); }
 .i-audio { background: linear-gradient(145deg, #4ade80, #14b8a6 55%, #0e7490); }
 .i-comments { background: linear-gradient(145deg, #c084fc, #8b5cf6 55%, #5b21b6); }
+.i-png { background: linear-gradient(145deg, #7dd3fc, #0ea5e9 55%, #0369a1); }
+
+/* ---------- PNG converter ---------- */
+.drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; cursor: pointer;
+  min-height: 220px; padding: 28px 16px; border: 2px dashed #343a46; border-radius: var(--radius); background: var(--panel);
+  transition: border-color .15s, background .15s; }
+.drop:hover, .drop:focus-visible { border-color: #4a5262; outline: none; }
+.drop.over { border-color: var(--accent); background: rgba(255, 90, 54, .06); }
+.drop input { display: none; }
+.drop-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--panel-2); color: var(--text); margin-bottom: 4px; }
+.drop-icon svg { width: 28px; height: 28px; }
+.drop-title { font-weight: 600; font-size: 16px; }
+.drop-sub { font-size: 13px; color: var(--muted); }
+.png-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 18px 0 10px; }
+.png-bar .status { margin: 0; min-height: 0; }
+.png-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.png-item { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.png-thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; }
+.png-thumb img { max-width: 100%; max-height: 100%; display: block; }
+.png-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.png-meta { font: 12px var(--mono); color: var(--muted); margin-top: 4px; }
+.png-meta.err { color: var(--err); font-family: var(--font); font-size: 13px; }
 
 /* ---------- Comment cards ---------- */
 .hero-tight { padding-bottom: 18px; }
@@ -253,6 +275,13 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
   .suggestions li { row-gap: 2px; }
   .sugg-price { grid-column: 2; }
   .apps { grid-template-columns: repeat(4, 72px); gap: 26px 14px; }
+  .tabs { max-width: calc(100vw - 60px); overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs a { white-space: nowrap; flex: none; }
+  .png-item { grid-template-columns: 56px minmax(0, 1fr); }
+  .png-thumb { width: 56px; height: 56px; }
+  .png-item .actions { grid-column: 1 / -1; }
+  .png-item .actions .btn { flex: 1; justify-content: center; }
   .cm-layout { grid-template-columns: 1fr; }
   .pl-pane { grid-template-columns: 1fr; }
   .pl-player { order: -1; }

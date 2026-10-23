@@ -1,6 +1,6 @@
 # awesome-vibe-site
 
-Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder**, **Audio Finder** and **Comment Cards**.
+Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder**, **Audio Finder**, **Comment Cards** and **PNG Converter**.
 
 ## Steam Kit
 
@@ -48,6 +48,10 @@ Sound FX and Music need two more secrets, added the same way as the Pixabay one:
 
 Recreate a viewer comment as an overlay: pick **YouTube**, **Instagram** or **TikTok** and **Light** or **Dark**, then fill in the username, comment, time and likes. Optional: upload the commenter's avatar (otherwise a coloured initial is used), a verified badge, and "liked by creator" (your own avatar is remembered for the creator heart). Export a 3× PNG with or without the card background, or copy it straight to the clipboard. These are simplified recreations of each layout without platform logos. Everything runs in the browser; no keys needed.
 
+## PNG Converter
+
+Drop, choose or paste (Ctrl+V) images in WebP, JPEG, JFIF, AVIF, GIF (first frame), BMP, SVG or ICO and get PNGs back with transparency kept. A single file downloads straight away; with several, use each **Download** button or **Download all (.zip)**. Everything runs in the browser and nothing is uploaded. HEIC and TIFF only open in Safari, since other browsers can't read them.
+
 ## Hosting on Cloudflare (free)
 
 1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com), open **Workers & Pages** and choose **Create application**.
@@ -87,7 +91,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js
+public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js, png.js
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

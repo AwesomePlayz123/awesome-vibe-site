@@ -21,6 +21,7 @@
       <a href="#clipart" data-view="clipart">Clipart</a>
       <a href="#audio" data-view="audio">Audio</a>
       <a href="#comments" data-view="comments">Comments</a>
+      <a href="#png" data-view="png">PNG</a>
     </nav>
   </header>
 
@@ -53,6 +54,12 @@
             <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 11h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H22l-7.5 6.2c-.8.7-2 .1-2-1V34H12a5 5 0 0 1-5-5V16a5 5 0 0 1 5-5z" fill="#fff"/><path d="M24 29.5s-6-3.6-6-7.6a3.3 3.3 0 0 1 6-1.9 3.3 3.3 0 0 1 6 1.9c0 4-6 7.6-6 7.6z" fill="#e8366b"/></svg>
           </span>
           <span class="app-name">Comments</span>
+        </a>
+        <a class="app" href="#png">
+          <span class="app-icon i-png">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 8h14l9 9v21a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="#fff"/><path d="M28 8v7a2 2 0 0 0 2 2h7" fill="#cfe9ff"/><text x="24" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="9.5" fill="#0369a1">PNG</text></svg>
+          </span>
+          <span class="app-name">PNG</span>
         </a>
       </div>
     </section>
@@ -290,6 +297,28 @@
       </article>
     </div>
    </div>
+   <div class="view" id="view-png" hidden>
+    <section class="hero hero-tight">
+      <h1>Convert to PNG.</h1>
+      <p>Drop in WebP, JPEG, JFIF, AVIF, GIF, BMP, SVG or ICO images and get PNGs back. Everything happens in your browser; nothing is uploaded.</p>
+    </section>
+    <label class="drop" id="pngDrop" tabindex="0">
+      <input id="pngInput" type="file" accept="image/*,.jfif,.pjpeg,.pjp,.avif,.ico,.svg" multiple />
+      <span class="drop-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="drop-title">Drop images here, or click to choose</span>
+      <span class="drop-sub">You can also paste an image with Ctrl+V</span>
+    </label>
+    <div class="png-bar" id="pngBar" hidden>
+      <span id="pngSummary" class="status"></span>
+      <div class="actions">
+        <button class="btn" id="pngZip" type="button">Download all (.zip)</button>
+        <button class="btn ghost" id="pngClear" type="button">Clear</button>
+      </div>
+    </div>
+    <ul id="pngList" class="png-list"></ul>
+   </div>
   </main>
 
   <script src="/nav.js" type="module"></script>
@@ -298,5 +327,6 @@
   <script src="/audio.js" type="module"></script>
   <script src="/playlists.js" type="module"></script>
   <script src="/comments.js" type="module"></script>
+  <script src="/png.js" type="module"></script>
 </body>
 </html>
