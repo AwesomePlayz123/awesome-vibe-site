@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steam Case Generator · awesome-vibe-site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/nav.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/tools/theme.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>">
+</head>
+<body data-tool="steam-case">
+  <header id="siteHeader"></header>
+
+  <main>
+    <section class="hero">
+      <h1>Steam case generator</h1>
+      <p class="lede">Put game covers inside a Steam case. One at a time, or a whole list at once.</p>
+    </section>
+
+    <section class="tool">
+      <form class="panel form" onsubmit="return false">
+        <div class="seg" id="mode" role="group" aria-label="Mode">
+          <button type="button" data-m="single" aria-pressed="true">Single</button>
+          <button type="button" data-m="bulk" aria-pressed="false">Bulk</button>
+        </div>
+
+        <div id="single" class="stack">
+          <div class="field">
+            <label class="label" for="steam">Game name, Steam link or app ID</label>
+            <div class="row">
+              <input id="steam" type="text" autocomplete="off" spellcheck="false" placeholder="Search, e.g. Elden Ring">
+              <button type="button" class="btn primary" id="go">Find cover</button>
+            </div>
+            <ul id="results" class="results" hidden></ul>
+            <p class="hint" id="find-hint"></p>
+          </div>
+
+          <p class="divider"><span>or</span></p>
+
+          <div class="field">
+            <span class="label">Your own image</span>
+            <div class="row">
+              <button type="button" class="btn" id="upload">Upload image</button>
+              <input type="file" id="file" accept="image/*" hidden>
+            </div>
+            <p class="hint">Best at 600 × 900 px. Other sizes are cropped to fit.</p>
+          </div>
+
+          <div class="field">
+            <label class="label" for="fname">File name</label>
+            <input id="fname" type="text" autocomplete="off" spellcheck="false" placeholder="steam-case">
+            <p class="hint">Filled in from the game's name. Edit it any time; .png is added for you.</p>
+          </div>
+        </div>
+
+        <div id="bulk" class="stack" hidden>
+          <div class="field">
+            <label class="label" for="bulkText">Games, one per line</label>
+            <textarea id="bulkText" rows="10" spellcheck="false" placeholder="Elden Ring&#10;Hades&#10;https://store.steampowered.com/app/1091500/&#10;413150"></textarea>
+            <p class="hint">Names, Steam links or app IDs. Each one becomes its own case.</p>
+          </div>
+          <div class="row">
+            <button type="button" class="btn primary" id="bulkGo">Generate all</button>
+            <button type="button" class="btn" id="bulkRetry" hidden>Retry failed</button>
+            <button type="button" class="btn" id="bulkClear">Clear</button>
+          </div>
+          <div class="progress" id="progress" hidden><div id="bar"></div></div>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <details class="settings">
+          <summary>Cover sources and settings</summary>
+          <p class="hint">Covers come from Steam first. If Steam doesn't have one, the tool tries SteamGridDB.</p>
+          <div class="field">
+            <label class="label" for="sgdbkey">SteamGridDB API key</label>
+            <input id="sgdbkey" type="password" autocomplete="off" spellcheck="false" placeholder="Optional but recommended">
+            <p class="hint">Free. On <a href="https://www.steamgriddb.com/profile/preferences/api" target="_blank" rel="noopener">steamgriddb.com</a>, sign in, open Preferences, then API.</p>
+          </div>
+          <div class="field">
+            <label class="label" for="proxy">Custom proxy URL (optional)</label>
+            <input id="proxy" type="text" autocomplete="off" spellcheck="false" placeholder="https://your-worker.workers.dev">
+            <p class="hint">Leave empty. Steam lookups already go through this site’s own server. Only fill this in if you run your own proxy.</p>
+          </div>
+          <button type="button" class="btn small" id="saveSettings">Save settings</button>
+        </details>
+      </form>
+
+      <div class="panel preview">
+        <div id="singlePrev">
+          <div class="actions">
+            <button type="button" class="btn" id="reset">Reset</button>
+            <button type="button" class="btn primary" id="download" disabled>Download</button>
+          </div>
+          <div class="stage-wrap"><canvas id="canvas" aria-label="Steam case preview"></canvas></div>
+        </div>
+        <div id="bulkPrev" hidden>
+          <div class="actions">
+            <button type="button" class="btn" id="folder" hidden>Save to folder…</button>
+            <button type="button" class="btn primary" id="zip" disabled>Download ZIP</button>
+          </div>
+          <p class="hint" id="bulkInfo">Add some games and press Generate all.</p>
+          <div id="bgrid" class="bgrid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script type="module" src="/site-header.js"></script>
+</body>
+</html>

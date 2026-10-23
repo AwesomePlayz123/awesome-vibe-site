@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thumbnail Viewer · awesome-vibe-site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/nav.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/tools/theme.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>">
+</head>
+<body data-tool="thumbnails">
+  <header id="siteHeader"></header>
+
+  <main>
+    <section class="hero">
+      <h1>Thumbnail viewer</h1>
+      <p class="lede">See your thumbnail and title next to the top videos in your niche.</p>
+    </section>
+
+    <section class="panel controls">
+      <div class="col">
+        <span class="label">Thumbnail</span>
+        <label class="drop" id="drop" for="file">
+          <img id="drop-img" alt="" hidden>
+          <span id="drop-text">Click to upload<br><small>or drop / paste an image</small></span>
+        </label>
+        <input type="file" id="file" accept="image/*" hidden>
+        <p class="hint" id="img-hint">Best at 1280 × 720 (16:9).</p>
+      </div>
+
+      <div class="col fields">
+        <div class="field">
+          <label class="label" for="title">Title</label>
+          <textarea id="title" rows="2" maxlength="100" placeholder="Your video title"></textarea>
+          <p class="hint"><span id="count">0</span> / 100 characters</p>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label class="label" for="channel">Channel name</label>
+            <input id="channel" type="text" maxlength="40" placeholder="Your Channel" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="label" for="duration">Duration</label>
+            <input id="duration" type="text" maxlength="8" value="12:34" autocomplete="off">
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label class="label" for="niche">Niche</label>
+            <div class="row">
+              <select id="niche"></select>
+              <button type="button" class="btn small" id="refresh" title="Fetch fresh results">Refresh</button>
+            </div>
+            <input id="custom" type="text" placeholder="Search keyword, then press Enter" autocomplete="off" hidden>
+          </div>
+          <div class="field">
+            <label class="label" for="pos">Your position</label>
+            <div class="row">
+              <select id="pos"></select>
+              <button type="button" class="btn small" id="shuffle">Shuffle</button>
+            </div>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="hl"> Highlight my video</label>
+
+        <details class="key" id="keybox">
+          <summary>YouTube API key</summary>
+          <p class="hint">Needed to load the top videos. Free, stored only in this browser.</p>
+          <div class="row">
+            <input id="key" type="password" placeholder="Paste your API key" autocomplete="off" spellcheck="false">
+            <button type="button" class="btn small" id="savekey">Save</button>
+          </div>
+          <ol class="steps">
+            <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> and create a project.</li>
+            <li>Go to <b>APIs &amp; Services → Library</b>, find <b>YouTube Data API v3</b>, and click Enable.</li>
+            <li>Go to <b>Credentials → Create credentials → API key</b>.</li>
+            <li>Edit the key: under <b>Application restrictions</b> pick <b>Websites</b> and add your site's address, and under <b>API restrictions</b> pick YouTube Data API v3. This stops others from using your key.</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+
+    <section class="panel stage">
+      <div class="bar">
+        <p id="msg" class="msg" role="status" aria-live="polite"></p>
+        <div class="seg" role="group" aria-label="Preview theme">
+          <button type="button" id="t-dark" aria-pressed="true">Dark</button>
+          <button type="button" id="t-light" aria-pressed="false">Light</button>
+        </div>
+      </div>
+      <div id="yt" class="yt dark"><div id="grid" class="vgrid"></div></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script type="module" src="/site-header.js"></script>
+</body>
+</html>

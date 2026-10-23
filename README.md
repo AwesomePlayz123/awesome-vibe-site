@@ -1,6 +1,11 @@
 # awesome-vibe-site
 
-Little tools that speed up YouTube editing. The home screen launches each tool: **Steam Kit**, **Clipart Finder**, **Audio Finder**, **Comment Cards** and **PNG Converter**.
+Little tools that speed up YouTube editing. The home screen launches each tool, with the Steam tools grouped in a **Steam** folder (and a **Steam ▾** menu in the navbar):
+
+- **Steam**: Steam Kit, Case Generator, Review Generator, Price Generator
+- **Clipart Finder**, **Audio Finder**, **Comment Cards**, **PNG Converter**, **Thumbnail Viewer**
+
+The Case, Review and Price generators and the Thumbnail Viewer were merged in from [notUltraHazard/vibe-tools](https://github.com/notUltraHazard/vibe-tools) and restyled to match this site.
 
 ## Steam Kit
 
@@ -15,6 +20,18 @@ Type a game's name and pick it from the suggestions (like the Steam store's sear
 
 Works with links like `https://store.steampowered.com/app/548430/Deep_Rock_Galactic/`, `steamcommunity.com/app/548430`, `steamdb.info/app/548430`, or `548430`.
 You can also link straight to a game with `?app=548430` (add `&cc=ca` for Canadian prices, etc.).
+
+## Steam Case, Review and Price generators
+
+- **Case Generator**: puts a game's cover into a Steam case (search by name, paste a link, or upload your own image), one at a time or a whole list at once (ZIP). Covers come from Steam first, then SteamGridDB if you add a free SteamGridDB API key under *Cover sources and settings* (stored in your browser).
+- **Review Generator**: builds a Steam store review (recommended or not, hours, dates, Steam formatting, votes, awards) and exports a PNG.
+- **Price Generator**: Steam discount tags, pulled from Steam or typed in, single or bulk (ZIP), in several store regions.
+
+All Steam and SteamGridDB lookups go through this site's own `/api/proxy`, so no third-party proxies are involved. Your SteamGridDB key is only ever forwarded to SteamGridDB.
+
+## Thumbnail Viewer
+
+Upload a thumbnail and title and see them in a YouTube-style grid next to the top videos in your niche. Loading those videos needs a free YouTube Data API key, which you paste into the page (stored in your browser); the page has step-by-step instructions.
 
 ## Clipart Finder
 
@@ -77,6 +94,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | --- | --- |
 | `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search (falls back to Valve's Web API search), with capsule art and prices. |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
+| `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
 | `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
 | `GET /api/file?src=…&download=…` | Passes files through from Steam's CDN (images, trailer playlists and video segments), Pixabay, Freesound and Jamendo, so the page can use them and save them with tidy names. Only those hosts are accepted. |
 | `GET /api/clipart?q=…&type=…&transparent=1&offset=…` | Searches Pixabay with the `PIXABAY_API_KEY` secret. Results are cached for 24 hours, as Pixabay asks. |
@@ -88,10 +106,11 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 ## Project layout
 
 ```
-functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
+functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, proxy.js, file.js, clipart.js, audio.js, spotify.js), shared by every way of running the site
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
-public/           the page: index.html, styles.css, nav.js (home screen + tabs), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js, png.js
+public/           the page: index.html, styles.css, nav.css + site-header.js (shared navbar), nav.js (views), folder.js (Steam folder), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js, png.js
+public/tools/     the merged tools (steam-case, steam-review, steam-price, thumbnail-viewer) + theme.css that restyles them
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

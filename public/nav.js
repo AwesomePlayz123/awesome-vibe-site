@@ -1,4 +1,5 @@
-// View switching: #home (default), #steam, #clipart, #audio.
+// View switching for the main app: #home (default), #steam, #clipart, #audio, #comments, #png.
+import { setActive } from './site-header.js';
 const TITLES = { home: 'Home', steam: 'Steam Kit', clipart: 'Clipart Finder', audio: 'Audio Finder', comments: 'Comment Cards', png: 'PNG Converter' };
 
 function currentView() {
@@ -12,12 +13,7 @@ function currentView() {
 function show() {
   const view = currentView();
   for (const el of document.querySelectorAll('.view')) el.hidden = el.id !== `view-${view}`;
-  for (const a of document.querySelectorAll('.tabs a')) {
-    const on = a.dataset.view === view;
-    a.classList.toggle('on', on);
-    if (on) a.setAttribute('aria-current', 'page');
-    else a.removeAttribute('aria-current');
-  }
+  setActive(view);
   document.title = view === 'home' ? 'awesome-vibe-site' : `${TITLES[view]} · awesome-vibe-site`;
   document.dispatchEvent(new CustomEvent('viewchange', { detail: view }));
 }

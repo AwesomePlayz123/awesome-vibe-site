@@ -7,9 +7,10 @@ import * as audio from './functions/api/audio.js';
 import * as steamSearch from './functions/api/steam-search.js';
 import * as spotify from './functions/api/spotify.js';
 import * as steamCheck from './functions/api/steam-check.js';
+import * as proxy from './functions/api/proxy.js';
 import { json } from './lib/http.js';
 
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy };
 
 export default {
   async fetch(request, env) {

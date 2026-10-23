@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steam Review Generator · awesome-vibe-site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Nunito+Sans:wght@400;500;600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/nav.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/tools/theme.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>">
+</head>
+<body data-tool="steam-review">
+  <header id="siteHeader"></header>
+
+  <main>
+    <section class="hero">
+      <h1>Steam review generator</h1>
+      <p class="lede">Build a Steam store review and download it as a PNG.</p>
+    </section>
+
+    <section class="tool">
+      <form class="panel form" onsubmit="return false">
+        <div class="seg" id="rec" role="group" aria-label="Recommendation">
+          <button type="button" data-v="yes" aria-pressed="true">Recommended</button>
+          <button type="button" data-v="no" aria-pressed="false">Not Recommended</button>
+        </div>
+
+        <h2>Profile</h2>
+        <div class="field">
+          <span class="label">Picture</span>
+          <div class="pic-row">
+            <img id="pic-thumb" class="pic-thumb" alt="Current profile picture">
+            <button type="button" class="btn small" id="upload">Upload</button>
+            <span class="or">or</span>
+            <button type="button" class="btn small" id="randomize">Randomize</button>
+            <input type="file" id="file" accept="image/*" hidden>
+          </div>
+          <p class="hint" id="pic-status"></p>
+        </div>
+        <div class="two">
+          <div class="field"><label class="label" for="username">Username</label><input id="username" type="text" maxlength="32" value="NiN" autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label class="label" for="namecolor">Name color</label>
+            <select id="namecolor"><option value="default">Default (gray)</option><option value="online">Online (blue)</option><option value="ingame">In-game (green)</option><option value="offline">Offline</option></select></div>
+        </div>
+        <div class="two">
+          <div class="field"><label class="label" for="reviews">Reviews written</label><input id="reviews" type="text" maxlength="8" value="75" autocomplete="off"></div>
+          <div class="field"><label class="label" for="products">Products in account</label><input id="products" type="text" maxlength="8" placeholder="Optional" autocomplete="off"></div>
+        </div>
+
+        <h2>Playtime and dates</h2>
+        <div class="two">
+          <div class="field"><label class="label" for="hours">Hours on record</label><input id="hours" type="text" maxlength="10" value="2.1" autocomplete="off"></div>
+          <div class="field"><label class="label" for="atreview">Hours at review time</label><input id="atreview" type="text" maxlength="10" value="0.9" placeholder="Optional" autocomplete="off"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label class="label" for="posted">Posted</label><input id="posted" type="text" maxlength="24" value="19 February" autocomplete="off"></div>
+          <div class="field"><label class="label" for="edited">Last edited</label><input id="edited" type="text" maxlength="24" placeholder="Optional" autocomplete="off"></div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="free"> Product received for free</label>
+          <label class="check"><input type="checkbox" id="early"> Early Access Review</label>
+          <label class="check"><input type="checkbox" id="refunded"> Product refunded</label>
+        </div>
+
+        <h2>Review</h2>
+        <div class="field">
+          <div class="tools" id="bb">
+            <button type="button" class="btn small" data-o="[b]" data-c="[/b]"><b>B</b></button>
+            <button type="button" class="btn small" data-o="[i]" data-c="[/i]"><i>I</i></button>
+            <button type="button" class="btn small" data-o="[u]" data-c="[/u]"><u>U</u></button>
+            <button type="button" class="btn small" data-o="[strike]" data-c="[/strike]"><s>S</s></button>
+            <button type="button" class="btn small" data-o="[spoiler]" data-c="[/spoiler]">Spoiler</button>
+            <button type="button" class="btn small" data-o="[h1]" data-c="[/h1]">H1</button>
+            <button type="button" class="btn small" data-o="[h2]" data-c="[/h2]">H2</button>
+            <button type="button" class="btn small" data-o="[list]\n[*]" data-c="\n[*]\n[/list]">List</button>
+            <button type="button" class="btn small" data-o="[hr][/hr]" data-c="">Line</button>
+          </div>
+          <textarea id="text" rows="8" maxlength="8000"></textarea>
+          <p class="hint">Steam formatting works: [b] [i] [u] [strike] [spoiler] [h1]-[h3] [hr] [list] [*]</p>
+        </div>
+
+        <h2>Votes</h2>
+        <div class="two">
+          <div class="field"><label class="label" for="helpful">Found helpful</label><input id="helpful" type="text" maxlength="8" value="64" autocomplete="off"></div>
+          <div class="field"><label class="label" for="funny">Found funny</label><input id="funny" type="text" maxlength="8" value="73" autocomplete="off"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="buttons" checked> Show “Was this review helpful?” buttons</label>
+
+        <div class="field">
+          <span class="label">Awards</span>
+          <div id="awards" class="awards"></div>
+        </div>
+
+        <h2>Display</h2>
+        <label class="check"><input type="checkbox" id="user" checked> Show user info (picture, name, review count)</label>
+        <div class="two">
+          <div class="field"><label class="label" for="header">Section header</label>
+            <select id="header"><option value="helpful">Most helpful (180 days)</option><option value="overall">Most helpful (overall)</option><option value="none">None</option></select></div>
+          <div class="field"><label class="label" for="bg">Background</label>
+            <select id="bg"><option value="steam">Steam page blue</option><option value="clear">Transparent</option></select></div>
+        </div>
+        <div class="two">
+          <div class="field"><label class="label" for="lang">Language</label>
+            <select id="lang"><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="it">Italiano</option></select></div>
+          <div class="field"><label class="label" for="font">Font</label>
+            <select id="font"><option value="mulish">Mulish (closest)</option><option value="nunito">Nunito Sans</option><option value="figtree">Figtree</option><option value="arial">Arial</option></select></div>
+        </div>
+        <div class="field"><label class="label" for="scale">Image quality</label>
+          <select id="scale"><option value="1">Normal (1x)</option><option value="2" selected>High (2x)</option><option value="3">Ultra (3x)</option></select></div>
+      </form>
+
+      <div class="panel preview">
+        <div class="actions">
+          <button type="button" class="btn" id="reset">Reset</button>
+          <button type="button" class="btn" id="copy">Copy</button>
+          <button type="button" class="btn primary" id="download">Download</button>
+        </div>
+        <div class="stage-wrap"><canvas id="canvas" aria-label="Steam review preview"></canvas></div>
+        <p class="hint" id="size"></p>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script type="module" src="/site-header.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+.tool { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); padding-bottom: 4rem; align-items: start; }
+@media (max-width: 56rem) { .tool { grid-template-columns: 1fr; } }
+[hidden] { display: none !important; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 1.5rem; }
+.form { display: flex; flex-direction: column; gap: 1rem; }
+.form h2 { margin: .75rem 0 0; font-size: 1rem; letter-spacing: .02em; color: var(--accent); }
+.field { display: flex; flex-direction: column; gap: .4rem; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.label { font-weight: 600; }
+.hint { margin: 0; color: var(--muted); font-size: .85rem; min-height: 1.2em; }
+.checks { display: flex; flex-direction: column; gap: .5rem; }
+.check { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
+.check input { accent-color: var(--accent); }
+
+.form input[type="text"], .form textarea, .form select {
+  width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 12px; padding: .65rem .8rem;
+}
+.form textarea { resize: vertical; font-size: .95rem; }
+.form input:focus, .form textarea:focus, .form select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--glow); }
+
+.seg { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { flex: 1; font: inherit; font-weight: 600; padding: .55rem .5rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+.pic-row { display: flex; align-items: center; gap: .6rem; }
+.pic-thumb { width: 3.4rem; height: 3.4rem; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); background: var(--bg); }
+.or { color: var(--muted); font-size: .9rem; }
+.tools { display: flex; flex-wrap: wrap; gap: .35rem; }
+.awards { display: grid; gap: .5rem; }
+.award { display: grid; grid-template-columns: 1fr 5rem; gap: .5rem; }
+
+.btn { font: inherit; font-weight: 600; cursor: pointer; padding: .55rem 1.1rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.btn:hover { border-color: var(--accent); color: var(--ink); }
+.btn.small { padding: .3rem .7rem; font-size: .85rem; border-radius: 8px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { color: var(--accent-ink); filter: brightness(1.08); }
+.btn:disabled { opacity: .6; cursor: progress; }
+
+.preview { position: sticky; top: 1rem; display: flex; flex-direction: column; padding: 1rem; background: #dcdde3; }
+.actions { display: flex; justify-content: flex-end; gap: .5rem; }
+.preview .btn:not(.primary) { background: #fff; color: #5d5a68; }
+.stage-wrap { display: flex; justify-content: center; padding: 1.25rem 0 .5rem; overflow-x: auto; }
+.preview .hint { text-align: center; color: #6b6975; }
+#canvas { display: block; max-width: 100%; height: auto; }
+@media (max-width: 56rem) { .preview { position: static; } }

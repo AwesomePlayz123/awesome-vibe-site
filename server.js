@@ -12,11 +12,12 @@ import * as audio from './functions/api/audio.js';
 import * as steamSearch from './functions/api/steam-search.js';
 import * as spotify from './functions/api/spotify.js';
 import * as steamCheck from './functions/api/steam-check.js';
+import * as proxy from './functions/api/proxy.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT) || 3000;
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy };
 
 // Secrets for local runs: environment variables, or a .dev.vars file (KEY=value per line, same as Cloudflare's tooling).
 const env = { ...process.env };
@@ -57,8 +58,18 @@ async function serveStatic(res, pathname) {
     return;
   }
   try {
-    const data = await fsp.readFile(filePath);
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });
+    let file = filePath;
+    const stat = await fsp.stat(file);
+    if (stat.isDirectory()) {
+      // Like Cloudflare: /tools/x → /tools/x/, and folders serve their index.html
+      if (!pathname.endsWith('/')) {
+        res.writeHead(308, { Location: `${pathname}/` }).end();
+        return;
+      }
+      file = path.join(file, 'index.html');
+    }
+    const data = await fsp.readFile(file);
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
     res.end(data);
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');
