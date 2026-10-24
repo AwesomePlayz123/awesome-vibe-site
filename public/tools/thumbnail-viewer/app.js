@@ -240,6 +240,9 @@
         ? `Showing ${comps.length} video${comps.length === 1 ? '' : 's'}${comps.length < 8 ? ' (add more links to fill the grid)' : ''}.`
         : 'No long-form videos found in those links.';
       if (failed.length) text2 += ' Couldn’t load: ' + failed.map((f) => `${f.line} (${f.error})`).join('; ') + '.';
+      if (failed.some((f) => /channel/.test(f.error || ''))) {
+        text2 += ' Tip: paste the channel ID instead (on the channel page: More about this channel → Share channel → Copy channel ID). It starts with UC and works without looking the channel up.';
+      }
       msg(text2, !comps.length || failed.length > 0);
     } catch (e) {
       if (id !== reqId) return;
