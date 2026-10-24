@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Figtree:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="/nav.css" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
@@ -267,58 +267,91 @@
     </section>
     <div class="cm-layout">
       <form id="cmForm" class="card cm-form" autocomplete="off">
-        <div class="cm-row">
-          <div class="seg seg-lg" id="cmPlatform" aria-label="Platform">
-            <button type="button" data-v="youtube" class="on">YouTube</button>
-            <button type="button" data-v="instagram">Instagram</button>
-            <button type="button" data-v="tiktok">TikTok</button>
-          </div>
-          <div class="seg seg-lg" id="cmTheme" aria-label="Theme">
-            <button type="button" data-v="light" class="on">Light</button>
-            <button type="button" data-v="dark">Dark</button>
-          </div>
+        <div class="seg seg-lg cm-platform" id="cmPlatform" aria-label="Platform">
+          <button type="button" data-v="youtube" class="on">YouTube</button>
+          <button type="button" data-v="instagram">Instagram</button>
+          <button type="button" data-v="tiktok">TikTok</button>
         </div>
 
-        <label class="field"><span>Username</span><input id="cmName" type="text" placeholder="e.g. commenter123" maxlength="60" /></label>
+        <label class="field"><span>Username</span><input id="cmName" type="text" placeholder="e.g. commenter123" maxlength="40" /></label>
         <label class="field"><span>Comment</span><textarea id="cmText" rows="4" maxlength="2000" placeholder="Type or paste the comment"></textarea></label>
+        <label class="field" data-for="instagram"><span>Replying to</span><input id="cmReplyTo" type="text" placeholder="Optional" maxlength="30" /></label>
+        <label class="field" data-for="youtube"><span>Channel name <em>(for "Pinned by …")</em></span><input id="cmChannel" type="text" placeholder="Your channel" maxlength="30" /></label>
         <div class="cm-row">
           <label class="field"><span>Posted</span><input id="cmTime" type="text" value="14 hours ago" maxlength="30" /></label>
           <label class="field"><span>Likes</span><input id="cmLikes" type="text" placeholder="e.g. 2 or 1.2K" maxlength="12" /></label>
+        </div>
+        <div class="cm-row">
+          <label class="field"><span>Badge</span><select id="cmBadge"></select></label>
+          <label class="field"><span>Color</span><select id="cmTheme"></select></label>
+        </div>
+        <div class="cm-row">
+          <label class="field"><span>Language</span>
+            <select id="cmLang">
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="pt">Português</option>
+              <option value="it">Italiano</option>
+            </select>
+          </label>
+          <label class="field"><span>Font</span>
+            <select id="cmFont">
+              <option value="default">Platform default</option>
+              <option value="inter">Inter</option>
+              <option value="roboto">Roboto</option>
+              <option value="figtree">Figtree</option>
+              <option value="system">Your system font</option>
+            </select>
+          </label>
         </div>
 
         <div class="field">
           <span>Avatar</span>
           <div class="cm-avatar-row">
             <canvas id="cmAvatarThumb" width="80" height="80" aria-hidden="true"></canvas>
-            <label class="btn ghost file-btn">Upload image<input id="cmAvatar" type="file" accept="image/*" /></label>
+            <label class="btn ghost file-btn">Upload<input id="cmAvatar" type="file" accept="image/*" /></label>
+            <button type="button" class="btn ghost" id="cmRandom">Randomize</button>
             <button type="button" class="btn ghost" id="cmAvatarClear" hidden>Remove</button>
           </div>
+          <span class="cm-hint" id="cmAvatarStatus"></span>
         </div>
 
         <div class="cm-checks">
           <label class="check"><input type="checkbox" id="cmHeart" checked /> Liked by creator</label>
-          <label class="check"><input type="checkbox" id="cmVerified" /> Verified badge</label>
           <label class="check"><input type="checkbox" id="cmBg" checked /> Card background</label>
+          <label class="check"><input type="checkbox" id="cmShadow" /> Drop shadow</label>
         </div>
 
         <div class="field" id="cmCreatorField">
           <span>Your avatar <em>(for the creator heart, remembered)</em></span>
           <div class="cm-avatar-row">
             <canvas id="cmCreatorThumb" width="80" height="80" aria-hidden="true"></canvas>
-            <label class="btn ghost file-btn">Upload image<input id="cmCreator" type="file" accept="image/*" /></label>
+            <label class="btn ghost file-btn">Upload<input id="cmCreator" type="file" accept="image/*" /></label>
             <button type="button" class="btn ghost" id="cmCreatorClear" hidden>Remove</button>
           </div>
         </div>
       </form>
 
-      <article class="card cm-preview-card">
-        <header><h3>Preview</h3><span class="tag">3× PNG</span></header>
-        <div class="preview checker cm-preview"><canvas id="cmCanvas"></canvas></div>
-        <div class="actions">
-          <button class="btn" id="cmDl" type="button">Download PNG</button>
-          <button class="btn ghost" id="cmCopy" type="button">Copy image</button>
-        </div>
-      </article>
+      <div class="cm-previews">
+        <article class="card cm-preview-card">
+          <header><h3>Compact</h3><span class="tag">Close to the real app · 3× PNG</span></header>
+          <div class="preview checker cm-preview"><canvas id="cmCanvas"></canvas></div>
+          <div class="actions">
+            <button class="btn" id="cmDl" type="button">Download PNG</button>
+            <button class="btn ghost" id="cmCopy" type="button">Copy image</button>
+          </div>
+        </article>
+        <article class="card cm-preview-card">
+          <header><h3>Bold</h3><span class="tag">Bigger text for video · 3× PNG</span></header>
+          <div class="preview checker cm-preview"><canvas id="cmCanvasB"></canvas></div>
+          <div class="actions">
+            <button class="btn" id="cmDlB" type="button">Download PNG</button>
+            <button class="btn ghost" id="cmCopyB" type="button">Copy image</button>
+          </div>
+        </article>
+      </div>
     </div>
    </div>
    <div class="view" id="view-png" hidden>

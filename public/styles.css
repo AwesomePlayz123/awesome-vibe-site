@@ -118,10 +118,18 @@ button.app { background: none; border: 0; padding: 0; font: inherit; color: var(
 .file-btn { position: relative; overflow: hidden; }
 .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .cm-checks { display: flex; flex-wrap: wrap; gap: 10px 18px; }
-.cm-preview-card { position: sticky; top: 16px; }
+.cm-previews { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 16px; }
+.cm-preview-card { min-width: 0; }
+.cm-platform { display: flex; }
+.cm-platform button { flex: 1; }
+.cm-form select { width: 100%; padding: 11px 12px; font: 14px var(--font); color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; outline: none; cursor: pointer; }
+.cm-form select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 90, 54, .15); }
+.cm-hint { font-size: 12px; color: var(--muted); min-height: 0; }
+.cm-hint:empty { display: none; }
+.cm-avatar-row { flex-wrap: wrap; }
 .cm-preview { min-height: 260px; padding: 28px; }
 .cm-preview canvas { max-width: 100%; height: auto; }
-#cmPlatform button, #cmTheme button { padding: 8px 12px; }
+#cmPlatform button { padding: 8px 12px; }
 
 /* ---------- Audio Finder ---------- */
 .seg-lg { padding: 4px; border-radius: 12px; }
@@ -293,7 +301,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
   .pl-player { order: -1; }
   .pl-embed iframe { height: 460px; }
   .audio-kind { display: flex; }
-  .cm-preview-card { position: static; order: -1; }
+  .cm-previews { position: static; order: -1; }
   .cm-preview { padding: 12px; min-height: 160px; }
   .app-icon { width: 66px; height: 66px; border-radius: 18px; }
   .app-name { font-size: 12px; }

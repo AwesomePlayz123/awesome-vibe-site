@@ -66,7 +66,12 @@ Sound FX and Music need two more secrets, added the same way as the Pixabay one:
 
 ## Comment Cards
 
-Recreate a viewer comment as an overlay: pick **YouTube**, **Instagram** or **TikTok** and **Light** or **Dark**, then fill in the username, comment, time and likes. Optional: upload the commenter's avatar (otherwise a coloured initial is used), a verified badge, and "liked by creator" (your own avatar is remembered for the creator heart). Export a 3× PNG with or without the card background, or copy it straight to the clipboard. These are simplified recreations of each layout without platform logos. Everything runs in the browser; no keys needed.
+Recreate a viewer comment as an overlay for **YouTube**, **Instagram** or **TikTok**. Two previews update together, each with its own Download and Copy:
+
+- **Compact**: sized close to the real apps.
+- **Bold**: bigger text that reads better in a video (the layouts from the vibe-tools Comment Generator).
+
+Options: username, comment, time, likes; **Replying to** (Instagram) and **Channel name** for "Pinned by" (YouTube); **Badge** (verified, creator/channel owner, pinned); **Color** (Light/Dark, or White/Black/Blue on Instagram); **Language** for the labels (English, Spanish, French, German, Portuguese, Italian); **Font**; avatar upload or **Randomize**; **Liked by creator** with your own remembered avatar; card background on/off for a transparent PNG; drop shadow. Everything runs in the browser; no keys needed.
 
 ## PNG Converter
 
