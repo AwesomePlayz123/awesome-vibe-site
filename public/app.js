@@ -465,8 +465,46 @@ function buildFlatCase(art) {
   return c;
 }
 
+// The Steam case from the Case Generator tool: a 611×1048 template with a 600×900 cover window at (0, 119).
+const STEAM_CASE = { W: 611, H: 1048, X: 0, Y: 119, CW: 600, CH: 900 };
+let steamCaseTpl = null;
+function loadSteamCaseTemplate() {
+  if (!steamCaseTpl) steamCaseTpl = loadImage('/tools/steam-case/case.png').catch((e) => { steamCaseTpl = null; throw e; });
+  return steamCaseTpl;
+}
+
+async function drawSteamCase(out) {
+  const art = state.images.cover;
+  let tpl;
+  try {
+    tpl = await loadSteamCaseTemplate();
+  } catch {
+    return;
+  }
+  if (state.caseStyle !== 'steam') return; // switched style while loading
+  const { W, H, X, Y, CW, CH } = STEAM_CASE;
+  out.width = W;
+  out.height = H;
+  const ctx = out.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  if (art) {
+    // cover-fit the art into the window, same as the Case Generator
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(X, Y, CW, CH);
+    ctx.clip();
+    ctx.imageSmoothingQuality = 'high';
+    const sc = Math.max(CW / art.width, CH / art.height);
+    const dw = art.width * sc, dh = art.height * sc;
+    ctx.drawImage(art, X + (CW - dw) / 2, Y + (CH - dh) / 2, dw, dh);
+    ctx.restore();
+  }
+  ctx.drawImage(tpl, 0, 0);
+}
+
 function drawCase() {
   const out = $('#caseCanvas');
+  if (state.caseStyle === 'steam') return drawSteamCase(out);
   const flat = buildFlatCase(state.images.cover);
   const W = flat.width, H = flat.height;
   const PAD = 90;
@@ -540,7 +578,8 @@ document.querySelectorAll('#coverCard .seg button').forEach((b) =>
 );
 
 $('#caseDl').addEventListener('click', () => {
-  if (state.game) saveCanvas($('#caseCanvas'), `${slug(state.game.name)} - Case ${state.caseStyle === 'front' ? 'Front' : 'Angled'}.png`);
+  const label = { front: 'Front', angled: 'Angled', steam: 'Steam' }[state.caseStyle] || 'Front';
+  if (state.game) saveCanvas($('#caseCanvas'), `${slug(state.game.name)} - Case ${label}.png`);
 });
 
 /* ---------------- Trailers ---------------- */

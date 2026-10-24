@@ -12,7 +12,7 @@ The Case, Review and Price generators and the Thumbnail Viewer were merged in fr
 Type a game's name and pick it from the suggestions (like the Steam store's search box), or paste a Steam store link or app id. You get everything you need for a video about that game:
 
 - **Logo** – the transparent library logo, as a PNG.
-- **Cover & case** – the 600×900 library cover art, plus a game-case mockup (front or angled) exported as a transparent PNG.
+- **Cover & case** – the 600×900 library cover art, plus a case mockup exported as a transparent PNG: our black case (front or angled) or the **Steam case** from the Case Generator (same template and output size).
 - **Store info card** – a recreation of the Steam store sidebar (header image, description, reviews, release date, developer, publisher), exported at 3× resolution. There's also a "Copy text" button.
 - **Trailers** – one-click MP4 download of each trailer at the best quality Steam offers.
 - **Price tag** – the Steam search-row look: capsule art, name, discount badge, struck-through original price and sale price (or Free / Coming Soon). Pick the store region to get that currency; turn the background off for a transparent PNG.
