@@ -269,6 +269,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
 .extra img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #000; }
 .extra span { display: flex; justify-content: space-between; padding: 9px 12px; font-size: 13px; }
 .extra span em { font-style: normal; color: var(--muted); }
+.extra-missing { aspect-ratio: 16/9; display: grid; place-items: center; background: var(--bg); color: var(--muted); font-size: 13px; }
 .extra:hover { border-color: #3a4150; }
 
 @media (max-width: 820px) {

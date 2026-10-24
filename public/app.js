@@ -663,6 +663,9 @@ function renderExtras(g) {
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.alt = label;
+    img.onerror = () => {
+      img.replaceWith(Object.assign(document.createElement('div'), { className: 'extra-missing', textContent: 'Preview unavailable' }));
+    };
     img.src = proxied(src);
     const cap = document.createElement('span');
     cap.innerHTML = `<b></b><em>Download ↓</em>`;

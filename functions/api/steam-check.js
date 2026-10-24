@@ -49,17 +49,24 @@ export async function onRequestGet({ request }) {
 
   // Raw trailer data from the Web API, to help fix trailer downloads if needed.
   let trailerSample = null;
+  let screenshotSample = null;
+  let assetUrlFormat = null;
   try {
     const res = await fetch(
       `https://api.steampowered.com/IStoreBrowseService/GetItems/v1?input_json=${input({
         ids: [{ appid: Number(app) }],
         context: { language: 'english', country_code: 'US' },
-        data_request: { include_trailers: true },
+        data_request: { include_trailers: true, include_screenshots: true, include_assets: true },
       })}`,
       { headers: { 'User-Agent': UA } }
     );
-    if (res.ok) trailerSample = (await res.json())?.response?.store_items?.[0]?.trailers?.highlights?.[0] || null;
+    if (res.ok) {
+      const it = (await res.json())?.response?.store_items?.[0] || {};
+      trailerSample = it.trailers?.highlights?.[0] || it.trailers?.other_trailers?.[0] || null;
+      screenshotSample = it.screenshots?.all_ages_screenshots?.slice(0, 2) || null;
+      assetUrlFormat = it.assets?.asset_url_format || null;
+    }
   } catch {}
 
-  return json(200, { checkedAt: new Date().toISOString(), app, checks, trailerSample });
+  return json(200, { checkedAt: new Date().toISOString(), app, checks, assetUrlFormat, screenshotSample, trailerSample });
 }
