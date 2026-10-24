@@ -49,17 +49,62 @@ function meta(html, key) {
   return null;
 }
 
-/** Channel id, name and avatar from a channel page's link-preview tags. Cached for a day. */
+// YouTube's cookie for "consent already given", so pages aren't replaced by the "Before you continue" screen.
+const PAGE_HEADERS = { ...HEADERS, Cookie: 'CONSENT=YES+cb; SOCS=CAESEwgDEgk0ODE3Nzk3MjQaAmVuIAEaBgiA_LyaBg' };
+
+const CHANNEL_ID_PATTERNS = [
+  /feeds\/videos\.xml\?channel_id=(UC[\w-]{22})/, // the RSS <link> every channel page has
+  /<link[^>]*rel="canonical"[^>]*href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"/,
+  /<link[^>]*href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"[^>]*rel="canonical"/,
+  /<meta[^>]*itemprop="(?:identifier|channelId)"[^>]*content="(UC[\w-]{22})"/,
+  /<meta[^>]*content="(UC[\w-]{22})"[^>]*itemprop="(?:identifier|channelId)"/,
+  /<meta[^>]*property="og:url"[^>]*content="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"/,
+  /"externalId":"(UC[\w-]{22})"/,
+  /"externalChannelId":"(UC[\w-]{22})"/,
+  /"channelId":"(UC[\w-]{22})"/,
+];
+
+function findChannelId(html) {
+  for (const re of CHANNEL_ID_PATTERNS) {
+    const m = html.match(re);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+async function fetchPage(url) {
+  const res = await fetch(url, { headers: PAGE_HEADERS, redirect: 'follow', signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw Object.assign(new Error(`YouTube returned ${res.status}`), { status: res.status });
+  return { html: await res.text(), finalUrl: res.url || url };
+}
+
+// A short description of a page we couldn't use, so failures say what actually came back.
+function describe(page) {
+  const host = (() => { try { return new URL(page.finalUrl).hostname; } catch { return 'youtube'; } })();
+  const title = decode(page.html.match(/<title[^>]*>([^<]{0,80})/i)?.[1] || '').trim();
+  if (/consent\./.test(host) || /before you continue/i.test(title)) return 'YouTube showed its cookie-consent page';
+  if (/sorry|unusual traffic|captcha/i.test(page.html.slice(0, 20000))) return 'YouTube asked for a captcha (too many requests from this server)';
+  if (/404|not found/i.test(title)) return 'YouTube says this channel doesn\u2019t exist';
+  return `no channel ID in YouTube\u2019s reply (${Math.round(page.html.length / 1024)} KB${title ? `, "${title}"` : ''})`;
+}
+
+/** Channel id, name and avatar from the channel page (the same link-preview info chat apps show). Cached for a day. */
 function channelInfo(path) {
-  return cachedJson(`yt-channel:${path.toLowerCase()}`, async () => {
-    const html = (await getText(`https://www.youtube.com/${path}`)).slice(0, 800000);
-    const id =
-      html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"/)?.[1] ||
-      meta(html, 'og:url')?.match(/channel\/(UC[\w-]{22})/)?.[1] ||
-      html.match(/"(?:externalId|browseId|channelId)":"(UC[\w-]{22})"/)?.[1] ||
-      null;
-    if (!id) throw new Error('couldn’t find that channel');
-    return { id, name: meta(html, 'og:title'), avatar: meta(html, 'og:image') };
+  return cachedJson(`yt-channel-v2:${path.toLowerCase()}`, async () => {
+    let page = await fetchPage(`https://www.youtube.com/${path}`);
+    let id = findChannelId(page.html);
+    if (!id) {
+      // Some channel pages come back trimmed; the About tab carries the same metadata.
+      try {
+        const about = await fetchPage(`https://www.youtube.com/${path}/about`);
+        id = findChannelId(about.html);
+        if (id) page = about;
+      } catch {
+        /* keep the first page for the error message */
+      }
+    }
+    if (!id) throw new Error(`couldn\u2019t find that channel: ${describe(page)}`);
+    return { id, name: meta(page.html, 'og:title'), avatar: meta(page.html, 'og:image') };
   });
 }
 
