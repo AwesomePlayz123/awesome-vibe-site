@@ -207,18 +207,35 @@
   };
   let source = store.get('tv-source', 'links') === 'niche' ? 'niche' : 'links';
 
+  // Pasted videos first, then channels take turns: each channel's most viewed recent upload, then the next round,
+  // so one big channel can't fill the whole grid.
   function pickComps(items) {
+    const LIMIT = 8;
     const seen = new Set();
-    const videos = items.filter((x) => x.from === 'video');
-    const fromChannels = items.filter((x) => x.from !== 'video').sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
     const out = [];
-    for (const x of [...videos, ...fromChannels]) {
-      if (seen.has(x.id)) continue;
+    const add = (x) => {
+      if (out.length >= LIMIT || seen.has(x.id)) return;
       seen.add(x.id);
       out.push(x);
-      if (out.length === 8) break;
+    };
+    items.filter((x) => x.from === 'video').forEach(add);
+
+    const byChannel = new Map();
+    for (const x of items.filter((x) => x.from !== 'video')) {
+      const key = x.channel || '?';
+      if (!byChannel.has(key)) byChannel.set(key, []);
+      byChannel.get(key).push(x);
     }
-    return out;
+    const queues = [...byChannel.values()].map((list) => list.sort((a, b) => (b.views ?? -1) - (a.views ?? -1)));
+    const fromChannels = [];
+    for (let round = 0; queues.some((q) => q[round]); round++) {
+      for (const q of queues) if (q[round]) fromChannels.push(q[round]);
+    }
+    const before = out.length;
+    fromChannels.forEach(add);
+    // Show the channel picks most-viewed first, like a real feed.
+    const picks = out.splice(before).sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
+    return [...out, ...picks];
   }
 
   async function loadLinks() {
