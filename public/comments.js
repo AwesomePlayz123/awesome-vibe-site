@@ -457,9 +457,10 @@ function render() {
     tr: d.tr,
     avatar: state.avatar ? avatarImage(state.avatar, d.name) : silhouette(),
     heartAvatar: avatarImage(state.creator, 'You'),
-    name: d.raw || 'username',
+    // Passed as typed, like his: a blank name on Instagram drops the name row (comment + "Replying to" only)
+    name: d.raw,
     comment: d.text,
-    replyTo: d.replyTo ? `@${d.replyTo}` : '',
+    replyTo: $('#cmReplyTo').value.trim(),
     channel: d.channel,
     time: d.time,
     likes: d.likes,
