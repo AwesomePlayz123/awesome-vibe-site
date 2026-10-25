@@ -377,7 +377,7 @@ async function generate() {
     }
     takes.push({ text: d.script, seconds, by: own ? NAMES[provider] : 'Built-in AI' });
     showTake(takes.length - 1);
-    status(d.research && !d.research.ok ? esc(d.research.error) : '', !!(d.research && !d.research.ok));
+    status(d.research && !d.research.ok ? esc(d.research.error) : esc(d.note || ''), !!(d.research && !d.research.ok));
   } catch (e) {
     status(esc(e.message === 'Failed to fetch' ? 'Couldn’t reach the site. Check your connection and try again.' : e.message), true);
   } finally {
