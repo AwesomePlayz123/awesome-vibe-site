@@ -317,10 +317,10 @@
     // recommendation strip
     const up = p.rec === 'yes';
     g.fillStyle = C.strip; g.fillRect(bx + rx, by + 6, STRIP_W, 42);
-    g.fillStyle = up ? C.blockUp : C.blockDown; g.fillRect(bx + rx, by + 7, 40, 40);
-    // Centre the thumb's actual outline (x 1–23, y 1–21 of its 24-unit box; 3–23 when flipped) in the 40px block.
+    g.fillStyle = up ? C.blockUp : C.blockDown; g.fillRect(bx + rx, by + 6, 42, 42);   // full height of the strip
+    // Centre the thumb's actual outline (x 1–23, y 1–21 of its 24-unit box; 3–23 when flipped) in the 42px block.
     const TS = 28, k = TS / 24;
-    icon(g, P.thumb, bx + rx + 20 - 12 * k, by + 27 - (up ? 11 : 13) * k, TS, up ? C.iconUp : C.iconDown, !up);
+    icon(g, P.thumb, bx + rx + 21 - 12 * k, by + 27 - (up ? 11 : 13) * k, TS, up ? C.iconUp : C.iconDown, !up);
     g.fillStyle = C.title; g.font = `500 16px ${fam}`;
     g.fillText(up ? T.rec : T.notrec, bx + rx + 50, by + 23);
     const hrs = p.hours ? fmt(T.hours, { h: p.hours }) + (p.at ? ' ' + fmt(T.at, { r: p.at }) : '') : '';
