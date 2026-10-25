@@ -306,6 +306,20 @@ function buildTikTok(p) {
 
 const BUILDERS = { instagram: buildInstagram, youtube: buildYouTube, tiktok: buildTikTok };
 
+// His default avatar when none is uploaded: a grey person silhouette.
+let silhouetteCanvas = null;
+export function silhouette() {
+  if (silhouetteCanvas) return silhouetteCanvas;
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.fillStyle = '#eceef2'; g.fillRect(0, 0, 256, 256);
+  g.fillStyle = '#8a8f9c';
+  g.beginPath(); g.arc(128, 98, 42, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.moveTo(46, 256); g.bezierCurveTo(46, 190, 86, 166, 128, 166); g.bezierCurveTo(170, 166, 210, 190, 210, 256); g.fill();
+  return (silhouetteCanvas = c);
+}
+
 /**
  * Draw the bold-style comment.
  * p: { platform, fam, tr, avatar, heartAvatar, name, comment, replyTo, channel, time, likes, badge, theme, hearted, bg, shadow }
@@ -318,6 +332,7 @@ export function renderBold(canvas, p) {
   const cw = Math.ceil(L.w), ch = Math.ceil(L.h);
   canvas.width = (cw + pad * 2) * S;
   canvas.height = (ch + pad * 2) * S;
+  canvas.style.width = `${cw + pad * 2}px`;
   ctx = canvas.getContext('2d');
   ctx.setTransform(S, 0, 0, S, pad * S, pad * S);
   ctx.textAlign = 'left';

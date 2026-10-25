@@ -129,6 +129,7 @@ button.app { background: none; border: 0; padding: 0; font: inherit; color: var(
 .cm-avatar-row { flex-wrap: wrap; }
 .cm-preview { min-height: 260px; padding: 28px; }
 .cm-preview canvas { max-width: 100%; height: auto; }
+.cm-preview-bold { background: #dcdde3; }
 #cmPlatform button { padding: 8px 12px; }
 
 /* ---------- Audio Finder ---------- */

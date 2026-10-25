@@ -2,7 +2,7 @@
 //   • Compact – our recreation, sized close to the real apps
 //   • Bold    – the larger layouts from the vibe-tools Comment Generator (comment-bold.js)
 // Both use the same form. Original, simplified layouts (no platform logos), exported at 3×.
-import { renderBold } from './comment-bold.js';
+import { renderBold, silhouette } from './comment-bold.js';
 
 const $ = (sel) => document.querySelector(sel);
 const S = 3; // export scale
@@ -455,7 +455,7 @@ function render() {
     platform: state.platform,
     fam: fontFor('bold'),
     tr: d.tr,
-    avatar: avatarImage(state.avatar, d.name),
+    avatar: state.avatar ? avatarImage(state.avatar, d.name) : silhouette(),
     heartAvatar: avatarImage(state.creator, 'You'),
     name: d.raw || 'username',
     comment: d.text,
