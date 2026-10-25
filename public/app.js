@@ -1,4 +1,4 @@
-import { buildTrailerMp4 } from './trailer.js';
+import { buildTrailerMp4, trailerSize, mb } from './trailer.js';
 
 const $ = (sel) => document.querySelector(sel);
 const state = { game: null, caseStyle: 'front', images: {} };
@@ -620,6 +620,9 @@ $('#caseDl').addEventListener('click', () => {
 
 /* ---------------- Trailers ---------------- */
 
+// Trailer sizes are checked one trailer at a time so they don't crowd out everything else loading.
+let sizeQueue = Promise.resolve();
+
 function renderTrailers(g) {
   const ul = $('#trailers');
   ul.innerHTML = '';
@@ -648,8 +651,16 @@ function renderTrailers(g) {
     }
     const meta = document.createElement('div');
     meta.className = 't-meta';
-    meta.textContent = t.hls ? 'HLS stream → MP4 (no re-encode)' : 'Direct MP4';
+    meta.textContent = 'MP4';
     info.append(name, meta);
+    sizeQueue = sizeQueue.then(() =>
+      trailerSize(t)
+        .then((n) => {
+          t.size = n;
+          if (meta.textContent === 'MP4') meta.textContent = `MP4 · ${mb(n)}`;
+        })
+        .catch(() => {}),
+    );
 
     const btn = document.createElement('button');
     btn.className = 'btn';
@@ -670,7 +681,7 @@ async function downloadTrailer(t, btn, meta) {
     const blob = await buildTrailerMp4(t, (msg) => (meta.textContent = msg));
     saveBlob(blob, `${filename}.mp4`);
     meta.className = 't-meta ok';
-    meta.textContent = `Saved ${filename}.mp4`;
+    meta.textContent = `Saved ${filename}.mp4 · ${mb(blob.size)}`;
   } catch (e) {
     meta.className = 't-meta err';
     meta.textContent = e.message;

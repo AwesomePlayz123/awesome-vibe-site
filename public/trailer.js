@@ -137,22 +137,61 @@ async function getFFmpeg(onStatus) {
   return ffmpegPromise;
 }
 
-const mb = (n) => `${(n / 1e6).toFixed(1)} MB`;
+export const mb = (n) => (n < 1e6 ? `${Math.max(1, Math.round(n / 1e3))} KB` : `${(n / 1e6).toFixed(1)} MB`);
 
 /**
  * @param {{hls?: string, mp4?: string}} trailer
  * @param {(msg: string) => void} onStatus
  * @returns {Promise<Blob>} an MP4
  */
+// Reads the playlists once per trailer (shared by the size check and the download).
+const plans = new Map();
+function planFor(hls) {
+  if (!plans.has(hls)) {
+    const p = (async () => {
+      const master = await fetchText(hls);
+      const pick = pickRenditions(master, hls);
+      const [videoPl, audioPl] = await Promise.all([fetchText(pick.video), pick.audio ? fetchText(pick.audio) : null]);
+      return { pick, video: parseMedia(videoPl, pick.video), audio: audioPl ? parseMedia(audioPl, pick.audio) : null };
+    })();
+    p.catch(() => plans.delete(hls));
+    plans.set(hls, p);
+  }
+  return plans.get(hls);
+}
+
+// Size of one file/part without downloading it: ask for its first byte and read the total from Content-Range.
+async function partSize(part) {
+  if (part.range) return part.range.length;
+  const res = await fetch(via(part.url), { headers: { Range: 'bytes=0-0' } });
+  res.body?.cancel().catch(() => {});
+  if (!res.ok) throw new Error(`size check failed (${res.status})`);
+  const total = (res.headers.get('content-range') || '').match(/\/(\d+)\s*$/);
+  if (total) return Number(total[1]);
+  const len = Number(res.headers.get('content-length')); // server ignored the range → full length
+  if (res.status === 200 && len) return len;
+  throw new Error('size unknown');
+}
+
+/** Download size of a trailer in bytes (what the MP4 will roughly weigh). */
+export async function trailerSize(trailer) {
+  if (!trailer.hls) return partSize({ url: trailer.mp4 });
+  const { video, audio } = await planFor(trailer.hls);
+  const parts = [...video.parts, ...(audio?.parts || [])];
+  let total = 0;
+  let next = 0;
+  const worker = async () => {
+    while (next < parts.length) total += await partSize(parts[next++]);
+  };
+  await Promise.all(Array.from({ length: Math.min(PARALLEL, parts.length) }, worker));
+  return total;
+}
+
 export async function buildTrailerMp4(trailer, onStatus) {
   if (!trailer.hls) return downloadDirect(trailer.mp4, onStatus);
 
   onStatus('Reading trailer stream…');
-  const master = await fetchText(trailer.hls);
-  const pick = pickRenditions(master, trailer.hls);
-  const [videoPl, audioPl] = await Promise.all([fetchText(pick.video), pick.audio ? fetchText(pick.audio) : null]);
-  const video = parseMedia(videoPl, pick.video);
-  const audio = audioPl ? parseMedia(audioPl, pick.audio) : null;
+  const { pick, video, audio } = await planFor(trailer.hls);
 
   const totalParts = video.parts.length + (audio?.parts.length || 0);
   let doneParts = 0;
