@@ -3,7 +3,7 @@
 Little tools that speed up YouTube editing. The home screen launches each tool, with the Steam tools grouped in a **Steam** folder (and a **Steam ▾** menu in the navbar):
 
 - **Steam**: Steam Kit, Case Generator, Review Generator, Price Generator
-- **Clipart Finder**, **Audio Finder**, **Comment Cards**, **PNG Converter**, **Thumbnail Viewer**
+- **Clipart Finder**, **Audio Finder**, **Comment Cards**, **PNG Converter**, **Thumbnail Viewer**, **Script Writer**
 
 The Case, Review and Price generators and the Thumbnail Viewer were merged in from [notUltraHazard/vibe-tools](https://github.com/notUltraHazard/vibe-tools) and restyled to match this site.
 
@@ -77,6 +77,17 @@ Options: username, comment, time, likes; **Replying to** (Instagram) and **Chann
 
 Drop, choose or paste (Ctrl+V) images in WebP, JPEG, JFIF, AVIF, GIF (first frame), BMP, SVG or ICO and get PNGs back with transparency kept. A single file downloads straight away; with several, use each **Download** button or **Download all (.zip)**. Everything runs in the browser and nothing is uploaded. HEIC and TIFF only open in Safari, since other browsers can't read them.
 
+## Script Writer
+
+Say what the video is (e.g. "Game showcase"), add any details to work in, a style ("funny, personable, non-robotic") and a length (15–90s presets or any number of seconds), and it writes a voiceover script sized to fit: about 2.6 words per second, the natural pace of a Short. The word count and read time update as you edit, with a badge showing whether it fits. **Regenerate** keeps earlier versions as **Takes** you can flip between.
+
+**AI settings** picks the AI:
+
+- **Built-in AI** (default): Cloudflare Workers AI (Llama 3.3 70B), free within Cloudflare's daily allowance and no key needed. It has to be switched on once: in the Cloudflare dashboard open **Workers & Pages** → this site → **Settings** → **Bindings** → **Add** → **Workers AI**, variable name `AI`, save, then **Retry deployment** on the latest deployment. (A Workers deployment picks it up from `wrangler.jsonc` automatically.)
+- **AI of your choice**: Claude (Anthropic) or ChatGPT (OpenAI) with your own API key and an editable model name (defaults `claude-haiku-5-5` and `gpt-5.4-mini`). The key is kept only in your browser (untick "Remember" to not save it at all) and sent with each request straight through to that provider. It's never stored on the site.
+
+If a draft lands well off the target length, the server asks the AI for one tightened or expanded rewrite.
+
 ## Hosting on Cloudflare (free)
 
 1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com), open **Workers & Pages** and choose **Create application**.
@@ -104,6 +115,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
 | `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
 | `GET /api/steam-review?url=…` | Reads a public Steam review page (and the reviewer's profile for their game and review counts) for the Review Generator's link tab. No API key needed. |
+| `POST /api/script` | Script Writer: builds the prompt and asks the chosen AI (Workers AI binding, or Claude/OpenAI with the key from the `X-AI-Key` header, never stored). |
 | `GET /api/youtube?links=…` | Keyless video data for the Thumbnail Viewer: YouTube oEmbed for videos, channel RSS feeds for uploads, channel names and avatars from the channel page's link-preview tags. |
 | *(library art fallback)* | Newer games keep their logo (and sometimes cover/hero) in hashed folders that Valve's store APIs don't list. When the usual paths miss, Steam Kit looks up the Steam client's art paths via [SteamCMD.net](https://www.steamcmd.net) (free, unofficial, no key), cached for a day. |
 | `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
@@ -121,7 +133,7 @@ functions/api/    the API handlers (game.js, steam-search.js, steam-check.js, pr
 worker.js         Cloudflare Workers entry point; wrangler.jsonc is its config
 lib/              shared code: steam.js talks to Steam, http.js has small response helpers
 public/           the page: index.html, styles.css, nav.css + site-header.js (shared navbar), nav.js (views), folder.js (Steam folder), app.js + trailer.js (Steam Kit), clipart.js, audio.js + playlists.js, comments.js, png.js
-public/tools/     the merged tools (steam-case, steam-review, steam-price, thumbnail-viewer) + theme.css that restyles them
+public/tools/     the tool pages (steam-case, steam-review, steam-price, thumbnail-viewer, script-writer) + theme.css that styles them
 public/vendor/    ffmpeg.wasm's small JS wrapper (MIT), kept local so its worker loads from the same site
 server.js         local dev server that runs the same handlers
 ```

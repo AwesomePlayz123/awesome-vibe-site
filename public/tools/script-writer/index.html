@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Script Writer · awesome-vibe-site</title>
+  <link rel="stylesheet" href="/nav.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/tools/theme.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M9 21l5-10 4 7 2-3 3 6z' fill='white'/></svg>">
+</head>
+<body data-tool="script">
+  <header id="siteHeader"></header>
+
+  <main>
+    <section class="hero">
+      <h1>Script writer</h1>
+      <p class="lede">Describe the video, pick a style and a length, and get a voiceover script that fits the time.</p>
+    </section>
+
+    <section class="tool">
+      <form class="panel form" id="form" onsubmit="return false">
+        <div class="field">
+          <label class="label" for="context">What’s the video?</label>
+          <input id="context" type="text" maxlength="200" placeholder="Game showcase" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="label" for="notes">Details <span class="opt">(optional)</span></label>
+          <textarea id="notes" rows="4" maxlength="3000" placeholder="Deep Rock Galactic: co-op space dwarves mining in caves. Mention the beer and “Rock and Stone”."></textarea>
+          <p class="hint">Names, facts and jokes to work in. The more real detail, the better the script.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="style">Style</label>
+          <input id="style" type="text" maxlength="300" placeholder="Funny, personable, non-robotic" autocomplete="off">
+        </div>
+        <div class="field">
+          <span class="label">Video length</span>
+          <div class="len-row">
+            <div class="seg" id="lengths" role="group" aria-label="Video length">
+              <button type="button" data-s="15">15s</button>
+              <button type="button" data-s="30" aria-pressed="true">30s</button>
+              <button type="button" data-s="45">45s</button>
+              <button type="button" data-s="60">60s</button>
+              <button type="button" data-s="90">90s</button>
+            </div>
+            <label class="custom"><input id="seconds" type="number" min="5" max="600" value="30" inputmode="numeric" aria-label="Seconds"> sec</label>
+          </div>
+          <p class="hint" id="target"></p>
+        </div>
+        <button type="button" class="btn primary big" id="generate">Write script</button>
+
+        <details class="ai" id="aiSettings">
+          <summary><span>AI settings</span><span class="ai-now" id="aiNow">Built-in AI</span></summary>
+          <div class="ai-body">
+            <div class="seg" id="aiMode" role="group" aria-label="Which AI">
+              <button type="button" data-v="builtin" aria-pressed="true">Built-in AI</button>
+              <button type="button" data-v="own" aria-pressed="false">AI of your choice</button>
+            </div>
+            <p class="hint" id="builtinNote">Free, no key needed. Runs on Cloudflare (Llama 3.3 70B). Good for drafts; your own AI usually sounds more natural.</p>
+            <div id="ownFields" hidden>
+              <div class="field">
+                <label class="label" for="provider">Provider</label>
+                <select id="provider">
+                  <option value="anthropic">Claude (Anthropic)</option>
+                  <option value="openai">ChatGPT (OpenAI)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="label" for="apiKey">API key</label>
+                <div class="key-row">
+                  <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key">
+                  <button type="button" class="btn small" id="showKey">Show</button>
+                </div>
+                <p class="hint" id="keyHelp"></p>
+              </div>
+              <div class="field">
+                <label class="label" for="model">Model</label>
+                <input id="model" type="text" maxlength="100" autocomplete="off" spellcheck="false">
+                <p class="hint">Leave as is unless you want a different model.</p>
+              </div>
+              <label class="check"><input type="checkbox" id="rememberKey" checked> Remember my key on this device</label>
+              <p class="hint">Your key is saved only in this browser and sent only with your own script requests. It’s never stored on the site.</p>
+            </div>
+          </div>
+        </details>
+      </form>
+
+      <div class="panel out">
+        <div class="out-head">
+          <div class="meter" id="meter" hidden>
+            <span id="wordCount">0 words</span>
+            <span class="dot">·</span>
+            <span id="readTime">~0s</span>
+            <span class="fit" id="fit"></span>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn" id="regen" disabled>Regenerate</button>
+            <button type="button" class="btn" id="copy" disabled>Copy</button>
+          </div>
+        </div>
+        <div class="empty" id="empty">Your script will show up here. You can edit it before copying.</div>
+        <textarea id="script" spellcheck="true" hidden aria-label="Script"></textarea>
+        <p class="status" id="status" role="status"></p>
+        <div class="takes" id="takesWrap" hidden>
+          <span class="label">Takes</span>
+          <div class="take-list" id="takes"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+  <script type="module" src="/site-header.js"></script>
+</body>
+</html>

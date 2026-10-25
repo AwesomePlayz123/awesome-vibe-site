@@ -16,11 +16,12 @@ import * as proxy from './functions/api/proxy.js';
 import * as youtube from './functions/api/youtube.js';
 import * as steamArt from './functions/api/steam-art.js';
 import * as steamReview from './functions/api/steam-review.js';
+import * as script from './functions/api/script.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const PORT = Number(process.env.PORT) || 3000;
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube, '/api/steam-art': steamArt, '/api/steam-review': steamReview };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube, '/api/steam-art': steamArt, '/api/steam-review': steamReview, '/api/script': script };
 
 // Secrets for local runs: environment variables, or a .dev.vars file (KEY=value per line, same as Cloudflare's tooling).
 const env = { ...process.env };
@@ -84,11 +85,19 @@ const server = http.createServer(async (req, res) => {
   try {
     const route = ROUTES[url.pathname];
     if (route) {
-      if (req.method !== 'GET' || !route.onRequestGet) return res.writeHead(405).end();
+      // Same as Pages: onRequestGet / onRequestPost per method.
+      const handler = route[`onRequest${req.method[0]}${req.method.slice(1).toLowerCase()}`];
+      if (!handler) return res.writeHead(405).end();
       const headers = new Headers();
       for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.set(k, v);
-      const request = new Request(url, { method: 'GET', headers });
-      return await sendResponse(res, await route.onRequestGet({ request, env }));
+      let body;
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        const chunks = [];
+        for await (const c of req) chunks.push(c);
+        body = Buffer.concat(chunks);
+      }
+      const request = new Request(url, { method: req.method, headers, body });
+      return await sendResponse(res, await handler({ request, env }));
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return res.writeHead(405).end();
     await serveStatic(res, url.pathname);

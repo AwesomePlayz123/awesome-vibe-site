@@ -59,6 +59,7 @@ body { min-height: 100vh; background:
 .i-comments { background: linear-gradient(145deg, #c084fc, #8b5cf6 55%, #5b21b6); }
 .i-png { background: linear-gradient(145deg, #7dd3fc, #0ea5e9 55%, #0369a1); }
 .i-thumbs { background: linear-gradient(145deg, #fca5a5, #ef4444 55%, #b91c1c); }
+.i-script { background: linear-gradient(145deg, #c4b5fd, #8b5cf6 55%, #6d28d9); }
 .i-case { background: linear-gradient(145deg, #fcd34d, #f59e0b 55%, #b45309); }
 .i-review { background: linear-gradient(145deg, #94a3b8, #64748b 55%, #334155); }
 .i-price { background: linear-gradient(145deg, #4b6d82, #344654 55%, #1f2c36); }

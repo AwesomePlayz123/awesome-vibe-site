@@ -16,6 +16,7 @@ export const NAV = [
   { id: 'comments', label: 'Comments', href: '/#comments' },
   { id: 'png', label: 'PNG', href: '/#png' },
   { id: 'thumbnails', label: 'Thumbnails', href: '/tools/thumbnail-viewer/' },
+  { id: 'script', label: 'Scripts', href: '/tools/script-writer/' },
 ];
 
 const CARET = '<svg class="site-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
