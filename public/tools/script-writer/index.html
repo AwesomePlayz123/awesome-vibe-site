@@ -25,9 +25,25 @@
           <input id="context" type="text" maxlength="200" placeholder="Game showcase" autocomplete="off">
         </div>
         <div class="field">
+          <label class="label" for="game">Game <span class="opt">(optional, researched on Steam)</span></label>
+          <div class="game-search">
+            <input id="game" type="text" maxlength="200" placeholder="Search Steam or paste a store link" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="gameResults" aria-autocomplete="list">
+            <ul class="results game-results" id="gameResults" role="listbox" hidden></ul>
+          </div>
+          <div class="game-card" id="gameCard" hidden>
+            <img id="gameImg" alt="">
+            <div class="gc-text"><b id="gameName"></b><span id="gameInfo"></span></div>
+            <button type="button" class="gc-x" id="gameClear" aria-label="Remove game">✕</button>
+          </div>
+          <details class="facts" id="factsBox" hidden>
+            <summary>What the AI will know about it</summary>
+            <pre id="factsText"></pre>
+          </details>
+        </div>
+        <div class="field">
           <label class="label" for="notes">Details <span class="opt">(optional)</span></label>
-          <textarea id="notes" rows="4" maxlength="3000" placeholder="Deep Rock Galactic: co-op space dwarves mining in caves. Mention the beer and “Rock and Stone”."></textarea>
-          <p class="hint">Names, facts and jokes to work in. The more real detail, the better the script.</p>
+          <textarea id="notes" rows="4" maxlength="3000" placeholder="Anything to work in: who recommended it, a joke, a moment you want to mention…"></textarea>
+          <p class="hint">Your own angle and extras. Facts about the game come from the research above.</p>
         </div>
         <div class="field">
           <label class="label" for="preset">Saved style</label>

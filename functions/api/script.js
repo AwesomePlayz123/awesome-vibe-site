@@ -1,8 +1,10 @@
-// POST /api/script  { provider: 'builtin'|'anthropic'|'openai', model?, context, style, notes, seconds, guide? }
+// POST /api/script  { provider: 'builtin'|'anthropic'|'openai', model?, context, style, notes, seconds, guide?, appid? }
 // guide = a saved style (the creator's own instructions), used as the AI's main brief.
+// appid = a Steam game to research first (store details, tags, review score, top player reviews).
 // Your own API key (if any) comes in the X-AI-Key header and is passed straight to that provider.
 import { json } from '../../lib/http.js';
 import { writeScript } from '../../lib/script.js';
+import { getGameFacts, factsToText } from '../../lib/game-facts.js';
 
 const clip = (s, n) => String(s || '').trim().slice(0, n);
 
@@ -20,7 +22,20 @@ export async function onRequestPost({ request, env }) {
     guide: clip(body.guide, 8000),
     seconds: Math.min(600, Math.max(5, Math.round(Number(body.seconds) || 30))),
   };
-  if (!input.context && !input.notes) return json(400, { error: 'Say what the video is about first.' });
+  const appid = String(body.appid || '').replace(/\D/g, '').slice(0, 10);
+  if (!input.context && !input.notes && !appid) return json(400, { error: 'Say what the video is about first.' });
+
+  // Research the game. If Steam can't be reached, still write the script and say so.
+  let research = null;
+  if (appid) {
+    try {
+      const f = await getGameFacts(appid);
+      input.facts = factsToText(f);
+      research = { ok: true, appid, name: f.name, reviews: f.reviews.length, tags: f.tags.length, score: f.reviewScore };
+    } catch (e) {
+      research = { ok: false, appid, error: 'Couldn’t reach Steam to research the game, so this script only uses what you typed.' };
+    }
+  }
 
   const opts = {
     provider: ['builtin', 'anthropic', 'openai'].includes(body.provider) ? body.provider : 'builtin',
@@ -29,7 +44,7 @@ export async function onRequestPost({ request, env }) {
     env,
   };
   try {
-    return json(200, await writeScript(opts, input));
+    return json(200, { ...(await writeScript(opts, input)), research });
   } catch (e) {
     if (e.message === 'BUILTIN_OFF') {
       return json(503, {

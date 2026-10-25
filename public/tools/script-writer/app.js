@@ -73,6 +73,118 @@ $('showKey').addEventListener('click', () => {
 // Open the settings automatically the first time someone picks their own AI without a key.
 if (mode === 'own' && !$('apiKey').value) $('aiSettings').open = true;
 
+/* ---------------- Game (researched on Steam) ---------------- */
+let game = null; // { id, name, image }
+try { game = JSON.parse(store.get('game', 'null')); } catch { game = null; }
+const parseAppId = (s) => { s = String(s || '').trim(); if (/^\d{2,10}$/.test(s)) return s; const m = s.match(/\/app\/(\d+)/i); return m ? m[1] : null; };
+const capsule = (id) => `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${id}/capsule_231x87.jpg`;
+
+const gi = $('game'), gr = $('gameResults');
+let searchTimer = 0, searchSeq = 0, active = -1, results = [];
+function closeResults() { gr.hidden = true; gi.setAttribute('aria-expanded', 'false'); active = -1; }
+function showResults(items, note) {
+  results = items;
+  gr.innerHTML = '';
+  if (note) { const li = document.createElement('li'); li.className = 'gr-note'; li.textContent = note; gr.appendChild(li); }
+  items.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.id = 'gr' + i;
+    li.innerHTML = '<img alt=""><span class="gr-name"></span>';
+    li.querySelector('img').src = it.image || capsule(it.id);
+    li.querySelector('img').onerror = function () { this.style.visibility = 'hidden'; };
+    li.querySelector('.gr-name').textContent = it.name;
+    li.addEventListener('mousedown', (e) => { e.preventDefault(); pickGame(it); });
+    gr.appendChild(li);
+  });
+  gr.hidden = !items.length && !note;
+  gi.setAttribute('aria-expanded', String(!gr.hidden));
+}
+function highlight(i) {
+  active = i;
+  [...gr.querySelectorAll('li[role=option]')].forEach((li, k) => li.classList.toggle('active', k === i));
+  gi.setAttribute('aria-activedescendant', i >= 0 ? 'gr' + i : '');
+}
+gi.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const q = gi.value.trim();
+  const id = parseAppId(q);
+  if (id && /\/app\//i.test(q)) { pickGame({ id, name: '', image: '' }); return; }
+  if (q.length < 2) { closeResults(); return; }
+  searchTimer = setTimeout(async () => {
+    const seq = ++searchSeq;
+    try {
+      const res = await fetch('/api/steam-search?q=' + encodeURIComponent(q) + '&cc=us');
+      const d = await res.json();
+      if (seq !== searchSeq) return;
+      if (!res.ok) throw new Error(d.error);
+      showResults(d.items || [], d.items?.length ? '' : 'No games found. You can also paste a Steam store link.');
+      highlight(-1);
+    } catch (e) {
+      if (seq === searchSeq) showResults([], e.message || 'Steam search isn’t reachable right now. You can paste a Steam store link.');
+    }
+  }, 250);
+});
+gi.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' && results.length) { e.preventDefault(); highlight(Math.min(results.length - 1, active + 1)); }
+  else if (e.key === 'ArrowUp' && results.length) { e.preventDefault(); highlight(Math.max(0, active - 1)); }
+  else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (active >= 0 && results[active]) pickGame(results[active]);
+    else if (results.length === 1) pickGame(results[0]);
+    else if (parseAppId(gi.value)) pickGame({ id: parseAppId(gi.value), name: '', image: '' });
+  } else if (e.key === 'Escape') closeResults();
+});
+gi.addEventListener('blur', () => setTimeout(closeResults, 120));
+
+let factsSeq = 0;
+async function loadFacts() {
+  const seq = ++factsSeq;
+  $('gameInfo').textContent = 'Researching on Steam…';
+  $('gameInfo').className = '';
+  $('factsBox').hidden = true;
+  try {
+    const res = await fetch('/api/game-facts?app=' + game.id);
+    const d = await res.json();
+    if (seq !== factsSeq) return;
+    if (!res.ok) throw new Error(d.error);
+    if (d.name && d.name !== game.name) { game.name = d.name; $('gameName').textContent = d.name; store.set('game', JSON.stringify(game)); }
+    const bits = [d.reviewScore ? d.reviewScore.replace(/\s*\(.*\)$/, '') : '', d.reviews?.length ? `${d.reviews.length} player reviews` : '', d.tags?.length ? `${d.tags.length} tags` : ''].filter(Boolean);
+    $('gameInfo').textContent = 'Researched' + (bits.length ? ': ' + bits.join(' · ') : '');
+    $('gameInfo').className = 'ok';
+    $('factsText').textContent = d.text;
+    $('factsBox').hidden = false;
+  } catch (e) {
+    if (seq !== factsSeq) return;
+    $('gameInfo').textContent = e.message || 'Couldn’t research this game right now. It will try again when you write.';
+    $('gameInfo').className = 'err';
+  }
+}
+function renderGame() {
+  $('gameCard').hidden = !game;
+  gi.parentElement.hidden = !!game;
+  $('factsBox').hidden = true;
+  if (!game) return;
+  $('gameName').textContent = game.name || `Steam app ${game.id}`;
+  $('gameImg').src = game.image || capsule(game.id);
+  $('gameImg').onerror = function () { this.style.visibility = 'hidden'; };
+  loadFacts();
+}
+function pickGame(it) {
+  game = { id: String(it.id), name: it.name || '', image: it.image || '' };
+  store.set('game', JSON.stringify(game));
+  gi.value = '';
+  closeResults();
+  renderGame();
+}
+$('gameClear').addEventListener('click', () => {
+  game = null;
+  store.set('game', null);
+  renderGame();
+  gi.focus();
+});
+renderGame();
+
 /* ---------------- Saved styles (popup) ---------------- */
 let presets = [];
 try { presets = JSON.parse(store.get('presets', '[]')) || []; } catch { presets = []; }
@@ -237,7 +349,7 @@ async function generate() {
   if (busy) return;
   const context = $('context').value.trim();
   const notes = $('notes').value.trim();
-  if (!context && !notes) { status('Say what the video is first.', true); $('context').focus(); return; }
+  if (!context && !notes && !game) { status('Say what the video is first.', true); $('context').focus(); return; }
   const own = mode === 'own';
   const provider = own ? $('provider').value : 'builtin';
   const key = own ? $('apiKey').value.trim() : '';
@@ -254,7 +366,7 @@ async function generate() {
     const res = await fetch('/api/script', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ provider, model: own ? $('model').value.trim() : '', context, notes, style: $('style').value.trim(), seconds, guide: presetById($('preset').value)?.text || '' }),
+      body: JSON.stringify({ provider, model: own ? $('model').value.trim() : '', context, notes, style: $('style').value.trim(), seconds, guide: presetById($('preset').value)?.text || '', appid: game?.id || '' }),
     });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -263,7 +375,7 @@ async function generate() {
     }
     takes.push({ text: d.script, seconds, by: own ? (provider === 'openai' ? 'ChatGPT' : 'Claude') : 'Built-in AI' });
     showTake(takes.length - 1);
-    status('');
+    status(d.research && !d.research.ok ? esc(d.research.error) : '', !!(d.research && !d.research.ok));
   } catch (e) {
     status(esc(e.message === 'Failed to fetch' ? 'Couldn’t reach the site. Check your connection and try again.' : e.message), true);
   } finally {

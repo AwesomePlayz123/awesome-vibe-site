@@ -81,6 +81,8 @@ Drop, choose or paste (Ctrl+V) images in WebP, JPEG, JFIF, AVIF, GIF (first fram
 
 Say what the video is (e.g. "Game showcase"), add any details to work in, a style ("funny, personable, non-robotic") and a length (15–90s presets or any number of seconds), and it writes a voiceover script sized to fit: about 2.6 words per second, the natural pace of a Short. The word count and read time update as you edit, with a badge showing whether it fits. **Regenerate** keeps earlier versions as **Takes** you can flip between.
 
+**Game research**: search for a game in the **Game** box (or paste its Steam store link) and the script is built on real facts from Steam: the store description and "about" text, genres, popular player tags, modes, developer, release date, price, review score, and the most helpful English player reviews (paraphrased, never quoted). **What the AI will know about it** shows exactly what was found, so you can check it. If Steam can't be reached, the script is still written from what you typed, and the page says so. Research is cached for a day per game.
+
 **Saved styles**: **Edit styles** opens a popup where you name a style and paste your own instructions for the AI (your channel, series, script structure, voice, do's and don'ts). Pick it in the **Saved style** dropdown and the AI follows it first; the length you choose still sets the word count, and Style notes and Details add to it. Saved styles stay in your browser.
 
 **AI settings** picks the AI:
@@ -117,6 +119,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
 | `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
 | `GET /api/steam-review?url=…` | Reads a public Steam review page (and the reviewer's profile for their game and review counts) for the Review Generator's link tab. No API key needed. |
+| `GET /api/game-facts?app=…` | Script Writer research for a Steam game: store details, popular tags, review score and the most helpful player reviews. |
 | `POST /api/script` | Script Writer: builds the prompt and asks the chosen AI (Workers AI binding, or Claude/OpenAI with the key from the `X-AI-Key` header, never stored). |
 | `GET /api/youtube?links=…` | Keyless video data for the Thumbnail Viewer: YouTube oEmbed for videos, channel RSS feeds for uploads, channel names and avatars from the channel page's link-preview tags. |
 | *(library art fallback)* | Newer games keep their logo (and sometimes cover/hero) in hashed folders that Valve's store APIs don't list. When the usual paths miss, Steam Kit looks up the Steam client's art paths via [SteamCMD.net](https://www.steamcmd.net) (free, unofficial, no key), cached for a day. |

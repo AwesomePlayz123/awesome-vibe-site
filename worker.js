@@ -12,9 +12,10 @@ import * as youtube from './functions/api/youtube.js';
 import * as steamArt from './functions/api/steam-art.js';
 import * as steamReview from './functions/api/steam-review.js';
 import * as script from './functions/api/script.js';
+import * as gameFacts from './functions/api/game-facts.js';
 import { json } from './lib/http.js';
 
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube, '/api/steam-art': steamArt, '/api/steam-review': steamReview, '/api/script': script };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube, '/api/steam-art': steamArt, '/api/steam-review': steamReview, '/api/script': script, '/api/game-facts': gameFacts };
 
 export default {
   async fetch(request, env) {
