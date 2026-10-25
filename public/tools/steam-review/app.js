@@ -530,5 +530,70 @@
     setTimeout(() => (btn.textContent = 'Copy'), 1500);
   });
 
+  // ---------- Tabs: from scratch / from a review link ----------
+  const linkBox = $('linkBox');
+  function setMode(m) {
+    document.querySelectorAll('#mode button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === m)));
+    linkBox.hidden = m !== 'link';
+    try { localStorage.setItem('steam-review.mode', m); } catch (e) {}
+    if (m === 'link' && !$('reviewUrl').value) $('reviewUrl').focus();
+  }
+  document.querySelectorAll('#mode button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.v)));
+  try { if (localStorage.getItem('steam-review.mode') === 'link') setMode('link'); } catch (e) {}
+
+  const linkStatus = (msg, kind) => { const el = $('linkStatus'); el.textContent = msg; el.className = 'hint' + (kind ? ' ' + kind : ''); };
+  async function copyReview() {
+    const url = $('reviewUrl').value.trim();
+    if (!url) { linkStatus('Paste a link to a Steam review first.', 'err'); return; }
+    const btn = $('fetchReview');
+    btn.disabled = true;
+    linkStatus('Reading the review…');
+    try {
+      const res = await fetch('/api/steam-review?url=' + encodeURIComponent(url));
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Couldn’t read that review (' + res.status + ').');
+
+      const set = (id, v) => ($(id).value = v == null ? '' : String(v));
+      set('username', d.name);
+      $('namecolor').value = d.status || 'default';
+      set('reviews', d.reviews);
+      set('products', d.products);
+      set('hours', d.hours);
+      set('atreview', d.atReview);
+      set('posted', d.posted);
+      set('edited', d.edited);
+      $('free').checked = !!d.free;
+      $('early').checked = !!d.earlyAccess;
+      $('refunded').checked = !!d.refunded;
+      set('text', d.text);
+      set('helpful', d.helpful);
+      set('funny', d.funny);
+      $('lang').value = 'en';
+      // Awards aren't copied, so clear the sample ones.
+      document.querySelectorAll('.award').forEach((r) => { r.querySelector('select').value = ''; r.querySelector('input').value = ''; });
+      rec = d.recommended === false ? 'no' : 'yes';
+      document.querySelectorAll('#rec button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === rec)));
+
+      let avatarNote = '';
+      if (d.avatar) {
+        try { await setAvatar('/api/file?src=' + encodeURIComponent(d.avatar)); status(''); }
+        catch (e) { avatarNote = ' (couldn’t load their picture)'; }
+      }
+      render();
+      const missing = [!d.products && 'products in account', !d.reviews && 'reviews written'].filter(Boolean);
+      linkStatus(
+        'Copied ' + (d.name ? d.name + '’s' : 'the') + ' review' + (d.game ? ' of ' + d.game : '') + avatarNote + '.' +
+          (missing.length ? ' Their profile hides ' + missing.join(' and ') + ', so fill those in if you want them.' : ''),
+        'ok'
+      );
+    } catch (e) {
+      linkStatus(e.message, 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  $('fetchReview').addEventListener('click', copyReview);
+  $('reviewUrl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); copyReview(); } });
+
   setAvatar(silhouette());
 })();

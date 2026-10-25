@@ -24,7 +24,7 @@ You can also link straight to a game with `?app=548430` (add `&cc=ca` for Canadi
 ## Steam Case, Review and Price generators
 
 - **Case Generator**: puts a game's cover into a Steam case (search by name, paste a link, or upload your own image), one at a time or a whole list at once (ZIP). Covers come from Steam first, then SteamGridDB if you add a free SteamGridDB API key under *Cover sources and settings* (stored in your browser).
-- **Review Generator**: builds a Steam store review (recommended or not, hours, dates, Steam formatting, votes, awards) and exports a PNG.
+- **Review Generator**: builds a Steam store review (recommended or not, hours, dates, Steam formatting, votes, awards) and exports a PNG. Two tabs: **From scratch**, or **From a review link**, where you paste a review link (`steamcommunity.com/id/<name>/recommended/<appid>`) and it copies the name, picture, hours, dates, text and votes, all still editable. Awards aren't copied, and products/reviews counts only come through when the profile shows them.
 - **Price Generator**: Steam discount tags, pulled from Steam or typed in, single or bulk (ZIP), in several store regions.
 
 All Steam and SteamGridDB lookups go through this site's own `/api/proxy`, so no third-party proxies are involved. Your SteamGridDB key is only ever forwarded to SteamGridDB.
@@ -103,6 +103,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/steam-search?q=…&cc=…` | Game-name suggestions from the Steam store search (falls back to Valve's Web API search), with capsule art and prices. |
 | `GET /api/game?url=…` | Looks up the game via Steam's `appdetails` API, the store browse API (for library art), and the store page (for the review rows). The Steam store site sometimes blocks cloud servers like Cloudflare's; when it does, everything comes from Valve's Web API (`api.steampowered.com`) instead, minus the "Recent reviews" row. |
 | `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
+| `GET /api/steam-review?url=…` | Reads a public Steam review page (and the reviewer's profile for their game and review counts) for the Review Generator's link tab. No API key needed. |
 | `GET /api/youtube?links=…` | Keyless video data for the Thumbnail Viewer: YouTube oEmbed for videos, channel RSS feeds for uploads, channel names and avatars from the channel page's link-preview tags. |
 | *(library art fallback)* | Newer games keep their logo (and sometimes cover/hero) in hashed folders that Valve's store APIs don't list. When the usual paths miss, Steam Kit looks up the Steam client's art paths via [SteamCMD.net](https://www.steamcmd.net) (free, unofficial, no key), cached for a day. |
 | `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
