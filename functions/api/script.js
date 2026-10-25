@@ -1,4 +1,4 @@
-// POST /api/script  { provider: 'builtin'|'anthropic'|'openai', model?, context, style, notes, seconds, guide?, appid? }
+// POST /api/script  { provider: 'builtin'|'anthropic'|'openai'|'gemini', model?, context, style, notes, seconds, guide?, appid? }
 // guide = a saved style (the creator's own instructions), used as the AI's main brief.
 // appid = a Steam game to research first (store details, tags, review score, top player reviews).
 // Your own API key (if any) comes in the X-AI-Key header and is passed straight to that provider.
@@ -38,7 +38,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const opts = {
-    provider: ['builtin', 'anthropic', 'openai'].includes(body.provider) ? body.provider : 'builtin',
+    provider: ['builtin', 'anthropic', 'openai', 'gemini'].includes(body.provider) ? body.provider : 'builtin',
     model: clip(body.model, 100),
     key: clip(request.headers.get('x-ai-key'), 400),
     env,

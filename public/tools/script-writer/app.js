@@ -4,9 +4,11 @@ const WPS = 2.6; // ~155 words a minute, a natural Shorts voiceover pace (same a
 const countWords = (s) => (String(s).match(/[\p{L}\p{N}'’-]+/gu) || []).length;
 const targetWords = (sec) => Math.max(15, Math.round(sec * WPS));
 
-const DEFAULT_MODELS = { anthropic: 'claude-haiku-5-5', openai: 'gpt-5.4-mini' };
+const DEFAULT_MODELS = { anthropic: 'claude-haiku-5-5', openai: 'gpt-5.4-mini', gemini: 'gemini-3.8-flash' };
+const NAMES = { anthropic: 'Claude', openai: 'ChatGPT', gemini: 'Gemini' };
 const KEY_HELP = {
   anthropic: 'Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> → API keys. Usage is billed to your Anthropic account (a script costs a fraction of a cent).',
+  gemini: 'Free: get one at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> with your Google account, no card needed. On the free tier, Google may use what you send to improve its products.',
   openai: 'Get one at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a> → API keys. Usage is billed to your OpenAI account (a script costs a fraction of a cent).',
 };
 
@@ -37,7 +39,7 @@ function renderMode() {
   document.querySelectorAll('#aiMode button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === mode)));
   $('ownFields').hidden = mode !== 'own';
   $('builtinNote').hidden = mode !== 'builtin';
-  $('aiNow').textContent = mode === 'builtin' ? 'Built-in AI' : $('provider').value === 'openai' ? 'ChatGPT' : 'Claude';
+  $('aiNow').textContent = mode === 'builtin' ? 'Built-in AI' : NAMES[$('provider').value];
 }
 renderMode();
 
@@ -373,7 +375,7 @@ async function generate() {
       if (d.code === 'builtin_off') { status(SETUP_BUILTIN, true); return; }
       throw new Error(d.error || `Something went wrong (${res.status}).`);
     }
-    takes.push({ text: d.script, seconds, by: own ? (provider === 'openai' ? 'ChatGPT' : 'Claude') : 'Built-in AI' });
+    takes.push({ text: d.script, seconds, by: own ? NAMES[provider] : 'Built-in AI' });
     showTake(takes.length - 1);
     status(d.research && !d.research.ok ? esc(d.research.error) : '', !!(d.research && !d.research.ok));
   } catch (e) {

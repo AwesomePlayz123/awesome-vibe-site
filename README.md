@@ -88,7 +88,7 @@ Say what the video is (e.g. "Game showcase"), add any details to work in, a styl
 **AI settings** picks the AI:
 
 - **Built-in AI** (default): Cloudflare Workers AI (Llama 3.3 70B), free within Cloudflare's daily allowance and no key needed. It has to be switched on once: in the Cloudflare dashboard open **Workers & Pages** → this site → **Settings** → **Bindings** → **Add** → **Workers AI**, variable name `AI`, save, then **Retry deployment** on the latest deployment. (A Workers deployment picks it up from `wrangler.jsonc` automatically.)
-- **AI of your choice**: Claude (Anthropic) or ChatGPT (OpenAI) with your own API key and an editable model name (defaults `claude-haiku-5-5` and `gpt-5.4-mini`). The key is kept only in your browser (untick "Remember" to not save it at all) and sent with each request straight through to that provider. It's never stored on the site.
+- **AI of your choice**: Claude (Anthropic), ChatGPT (OpenAI) or Gemini (Google) with your own API key and an editable model name (defaults `claude-haiku-5-5`, `gpt-5.4-mini`, `gemini-3.8-flash`). Gemini keys from [Google AI Studio](https://aistudio.google.com/apikey) have a free tier (no card; Google may use free-tier prompts to improve its products); Claude and ChatGPT keys need prepaid API credit, separate from their chat plans. The key is kept only in your browser (untick "Remember" to not save it at all) and sent with each request straight through to that provider. It's never stored on the site.
 
 If a draft lands well off the target length, the server asks the AI for one tightened or expanded rewrite.
 
@@ -120,7 +120,7 @@ Then open http://localhost:3000. The local server runs the exact same `functions
 | `GET /api/proxy?url=…` | Pass-through for the Case/Review/Price tools, limited to Steam's store API, Steam's Web API, Steam's image CDN and SteamGridDB. |
 | `GET /api/steam-review?url=…` | Reads a public Steam review page (and the reviewer's profile for their game and review counts) for the Review Generator's link tab. No API key needed. |
 | `GET /api/game-facts?app=…` | Script Writer research for a Steam game: store details, popular tags, review score and the most helpful player reviews. |
-| `POST /api/script` | Script Writer: builds the prompt and asks the chosen AI (Workers AI binding, or Claude/OpenAI with the key from the `X-AI-Key` header, never stored). |
+| `POST /api/script` | Script Writer: builds the prompt and asks the chosen AI (Workers AI binding, or Claude/OpenAI/Gemini with the key from the `X-AI-Key` header, never stored). |
 | `GET /api/youtube?links=…` | Keyless video data for the Thumbnail Viewer: YouTube oEmbed for videos, channel RSS feeds for uploads, channel names and avatars from the channel page's link-preview tags. |
 | *(library art fallback)* | Newer games keep their logo (and sometimes cover/hero) in hashed folders that Valve's store APIs don't list. When the usual paths miss, Steam Kit looks up the Steam client's art paths via [SteamCMD.net](https://www.steamcmd.net) (free, unofficial, no key), cached for a day. |
 | `GET /api/steam-check` | Diagnostic: shows which Steam servers the deployment can currently reach. |
