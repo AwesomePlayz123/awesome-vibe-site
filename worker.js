@@ -9,9 +9,10 @@ import * as spotify from './functions/api/spotify.js';
 import * as steamCheck from './functions/api/steam-check.js';
 import * as proxy from './functions/api/proxy.js';
 import * as youtube from './functions/api/youtube.js';
+import * as steamArt from './functions/api/steam-art.js';
 import { json } from './lib/http.js';
 
-const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube };
+const ROUTES = { '/api/game': game, '/api/file': file, '/api/clipart': clipart, '/api/audio': audio, '/api/steam-search': steamSearch, '/api/spotify': spotify, '/api/steam-check': steamCheck, '/api/proxy': proxy, '/api/youtube': youtube, '/api/steam-art': steamArt };
 
 export default {
   async fetch(request, env) {

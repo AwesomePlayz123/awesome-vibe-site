@@ -236,8 +236,9 @@ async function render(g) {
   $('#storeLink').href = g.storeUrl;
   const base = slug(g.name);
 
-  // Logo
-  showImageOrEmpty($('#logoImg'), g.images.logo, 'Couldn’t find a library logo for this game. Try again in a bit, or grab it from SteamGridDB.');
+  // Logo (on newer games it may still be on its way; see fillMissingArt)
+  const missing = g.artMissing || [];
+  showImageOrEmpty($('#logoImg'), g.images.logo, missing.includes('logo') ? 'Looking for the logo…' : NO_LOGO);
   setDownloadLink($('#logoDl'), g.images.logo, `${base} - Logo.png`);
 
   // Cover
@@ -255,6 +256,41 @@ async function render(g) {
   drawCase();
   renderTrailers(g);
   renderExtras(g);
+  if (missing.length) fillMissingArt(g, missing);
+}
+
+const NO_LOGO = 'Couldn’t find a library logo for this game. Try again in a bit, or grab it from SteamGridDB.';
+
+// Second pass for art the quick lookup missed (usually the logo on newer games). Runs after the game is shown,
+// so the rest of Steam Kit doesn't wait for it.
+async function fillMissingArt(g, missing) {
+  let found = {};
+  try {
+    const res = await fetch(`/api/steam-art?app=${g.appid}&need=${missing.join(',')}`);
+    if (res.ok) found = await res.json();
+  } catch {}
+  if (state.game !== g) return; // a different game was loaded meanwhile
+  const base = slug(g.name);
+
+  if (missing.includes('logo')) {
+    g.images.logo = found.logo || null;
+    showImageOrEmpty($('#logoImg'), g.images.logo, NO_LOGO);
+    setDownloadLink($('#logoDl'), g.images.logo, `${base} - Logo.png`);
+  }
+  if (found.cover) {
+    g.images.cover = found.cover;
+    showImageOrEmpty($('#coverImg'), g.images.cover, '');
+    setDownloadLink($('#coverDl'), g.images.cover, `${base} - Cover.${extOf(g.images.cover)}`);
+    const img = await loadImage(proxied(found.cover)).catch(() => null);
+    if (img && state.game === g) {
+      state.images.cover = img;
+      drawCase();
+    }
+  }
+  if (found.hero) {
+    g.images.hero = found.hero;
+    renderExtras(g);
+  }
 }
 
 /* ---------------- Store info card ---------------- */
