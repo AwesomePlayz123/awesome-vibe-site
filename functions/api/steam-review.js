@@ -38,7 +38,8 @@ export async function onRequestGet({ request }) {
     const counts = parseProfileCounts(profile.html);
     data.products = counts.products;
     data.reviews = counts.reviews;
-    if (!data.avatar && counts.avatar) data.avatar = counts.avatar;
+    // The profile page's link-preview image is always the profile's own picture, so it wins.
+    if (counts.avatar) data.avatar = counts.avatar;
   }
   data.appid = link.appid;
   data.url = link.reviewUrl;
