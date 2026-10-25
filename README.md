@@ -24,7 +24,7 @@ You can also link straight to a game with `?app=548430` (add `&cc=ca` for Canadi
 ## Steam Case, Review and Price generators
 
 - **Case Generator**: puts a game's cover into a Steam case (search by name, paste a link, or upload your own image), one at a time or a whole list at once (ZIP). Covers come from Steam first, then SteamGridDB if you add a free SteamGridDB API key under *Cover sources and settings* (stored in your browser).
-- **Review Generator**: builds a Steam store review (recommended or not, hours, dates, Steam formatting, votes, awards) and exports a PNG. Two tabs: **From scratch**, or **From a review link**, where you paste a review link (`steamcommunity.com/id/<name>/recommended/<appid>`) and it copies the name, picture, hours, dates, text and votes, all still editable. Awards aren't copied, and products/reviews counts only come through when the profile shows them.
+- **Review Generator**: builds a Steam store review (recommended or not, hours, dates, Steam formatting, votes, awards) and exports a PNG. Optionally paste a review link (`steamcommunity.com/id/<name>/recommended/<appid>`) and it copies the name, picture, hours, dates, text and votes, all still editable. Awards aren't copied, and products/reviews counts only come through when the profile shows them.
 - **Price Generator**: Steam discount tags, pulled from Steam or typed in, single or bulk (ZIP), in several store regions.
 
 All Steam and SteamGridDB lookups go through this site's own `/api/proxy`, so no third-party proxies are involved. Your SteamGridDB key is only ever forwarded to SteamGridDB.

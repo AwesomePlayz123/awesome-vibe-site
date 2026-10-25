@@ -530,17 +530,7 @@
     setTimeout(() => (btn.textContent = 'Copy'), 1500);
   });
 
-  // ---------- Tabs: from scratch / from a review link ----------
-  const linkBox = $('linkBox');
-  function setMode(m) {
-    document.querySelectorAll('#mode button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === m)));
-    linkBox.hidden = m !== 'link';
-    try { localStorage.setItem('steam-review.mode', m); } catch (e) {}
-    if (m === 'link' && !$('reviewUrl').value) $('reviewUrl').focus();
-  }
-  document.querySelectorAll('#mode button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.v)));
-  try { if (localStorage.getItem('steam-review.mode') === 'link') setMode('link'); } catch (e) {}
-
+  // ---------- Optional: copy a real review from its link ----------
   const linkStatus = (msg, kind) => { const el = $('linkStatus'); el.textContent = msg; el.className = 'hint' + (kind ? ' ' + kind : ''); };
   async function copyReview() {
     const url = $('reviewUrl').value.trim();

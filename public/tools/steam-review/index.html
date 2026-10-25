@@ -23,17 +23,13 @@
 
     <section class="tool">
       <form class="panel form" onsubmit="return false">
-        <div class="seg mode" id="mode" role="group" aria-label="How to start">
-          <button type="button" data-v="scratch" aria-pressed="true">From scratch</button>
-          <button type="button" data-v="link" aria-pressed="false">From a review link</button>
-        </div>
-        <div class="field link-box" id="linkBox" hidden>
-          <label class="label" for="reviewUrl">Steam review link</label>
+        <div class="field link-box" id="linkBox">
+          <label class="label" for="reviewUrl">Steam review link <span class="opt">(optional)</span></label>
           <div class="link-row">
             <input id="reviewUrl" type="url" placeholder="https://steamcommunity.com/id/name/recommended/1245620" autocomplete="off" spellcheck="false">
             <button type="button" class="btn primary" id="fetchReview">Copy review</button>
           </div>
-          <p class="hint" id="linkStatus">Copies the review into everything below. You can still tweak any of it.</p>
+          <p class="hint" id="linkStatus">Paste a review link to copy it into everything below, or skip this and fill it in yourself.</p>
         </div>
 
         <div class="seg" id="rec" role="group" aria-label="Recommendation">
