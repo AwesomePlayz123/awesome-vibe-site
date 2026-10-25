@@ -30,7 +30,15 @@
           <p class="hint">Names, facts and jokes to work in. The more real detail, the better the script.</p>
         </div>
         <div class="field">
-          <label class="label" for="style">Style</label>
+          <label class="label" for="preset">Saved style</label>
+          <div class="preset-row">
+            <select id="preset"><option value="">None</option></select>
+            <button type="button" class="btn" id="editPresets">Edit styles</button>
+          </div>
+          <p class="hint" id="presetHint">Save your own script format and voice once, then pick it here.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="style">Style notes <span class="opt">(optional)</span></label>
           <input id="style" type="text" maxlength="300" placeholder="Funny, personable, non-robotic" autocomplete="off">
         </div>
         <div class="field">
@@ -108,6 +116,38 @@
       </div>
     </section>
   </main>
+  <dialog class="presets" id="presetDialog" aria-labelledby="presetTitle">
+    <form method="dialog" class="pd" id="presetForm" onsubmit="return false">
+      <div class="pd-head">
+        <h2 id="presetTitle">Saved styles</h2>
+        <button type="button" class="pd-x" id="presetClose" aria-label="Close">✕</button>
+      </div>
+      <div class="pd-body">
+        <aside class="pd-list">
+          <ul id="presetList"></ul>
+          <button type="button" class="btn small" id="presetNew">+ New style</button>
+        </aside>
+        <div class="pd-edit">
+          <div class="field">
+            <label class="label" for="presetName">Name</label>
+            <input id="presetName" type="text" maxlength="60" placeholder="Signal Found" autocomplete="off">
+          </div>
+          <div class="field grow">
+            <label class="label" for="presetText">Instructions for the AI</label>
+            <textarea id="presetText" maxlength="8000" placeholder="Paste your system prompt: who you are, the series, the structure (hook, showcase, loop…), the voice, things to always or never do."></textarea>
+            <p class="hint">The AI follows these first. The length you pick still sets how long the script is.</p>
+          </div>
+        </div>
+      </div>
+      <div class="pd-foot">
+        <button type="button" class="btn danger" id="presetDelete">Delete</button>
+        <span class="pd-msg" id="presetMsg"></span>
+        <button type="button" class="btn" id="presetCancel">Close</button>
+        <button type="button" class="btn primary" id="presetSave">Save style</button>
+      </div>
+    </form>
+  </dialog>
+
   <script type="module" src="app.js"></script>
   <script type="module" src="/site-header.js"></script>
 </body>

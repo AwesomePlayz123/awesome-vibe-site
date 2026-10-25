@@ -59,3 +59,39 @@ details.ai > summary::before { content: ''; width: 16px; height: 16px; flex: non
 .take-list button[aria-pressed="true"] { background: var(--ink); color: #111; border-color: var(--ink); }
 .setup { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
 .setup b { color: var(--ink); }
+
+/* Saved styles */
+.preset-row { display: flex; gap: 8px; }
+.preset-row select { flex: 1; min-width: 0; }
+dialog.presets { width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--ink); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+dialog.presets::backdrop { background: rgba(5, 7, 10, .65); backdrop-filter: blur(3px); }
+.pd { display: flex; flex-direction: column; max-height: calc(100vh - 50px); }
+.pd-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.pd-head h2 { margin: 0; font-size: 17px; }
+.pd-x { background: none; border: 0; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+.pd-x:hover { color: var(--ink); background: var(--surface-2); }
+.pd-body { display: grid; grid-template-columns: 200px minmax(0, 1fr); min-height: 0; flex: 1; overflow: auto; }
+.pd-list { border-right: 1px solid var(--line); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.pd-list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pd-list li button { width: 100%; text-align: left; font: 600 14px var(--font); color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 8px 10px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-list li button:hover { color: var(--ink); background: var(--surface-2); }
+.pd-list li button[aria-current="true"] { color: var(--ink); background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+.pd-list .empty-note { color: var(--muted); font-size: 13px; padding: 4px 2px; }
+.pd-edit { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.pd-edit .field { display: flex; flex-direction: column; gap: 6px; }
+.pd-edit input, .pd-edit textarea { width: 100%; font: 14px var(--font); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
+.pd-edit textarea { min-height: 300px; resize: vertical; line-height: 1.55; }
+.pd-edit input:focus, .pd-edit textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 90, 54, .15); }
+.pd-foot { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-top: 1px solid var(--line); }
+.pd-msg { margin-right: auto; font-size: 13px; color: var(--muted); }
+.pd-msg.ok { color: var(--ok); }
+.pd-msg.err { color: var(--err); }
+.btn.danger { color: #ff8a80; }
+.btn.danger:hover { border-color: rgba(255, 107, 107, .5); color: #ffb3ab; }
+@media (max-width: 640px) {
+  .pd-body { grid-template-columns: 1fr; }
+  .pd-list { border-right: 0; border-bottom: 1px solid var(--line); }
+  .pd-list ul { flex-direction: row; flex-wrap: wrap; }
+  .pd-list li button { width: auto; }
+  .pd-edit textarea { min-height: 220px; }
+}

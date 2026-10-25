@@ -1,4 +1,5 @@
-// POST /api/script  { provider: 'builtin'|'anthropic'|'openai', model?, context, style, notes, seconds }
+// POST /api/script  { provider: 'builtin'|'anthropic'|'openai', model?, context, style, notes, seconds, guide? }
+// guide = a saved style (the creator's own instructions), used as the AI's main brief.
 // Your own API key (if any) comes in the X-AI-Key header and is passed straight to that provider.
 import { json } from '../../lib/http.js';
 import { writeScript } from '../../lib/script.js';
@@ -16,6 +17,7 @@ export async function onRequestPost({ request, env }) {
     context: clip(body.context, 200),
     style: clip(body.style, 300),
     notes: clip(body.notes, 3000),
+    guide: clip(body.guide, 8000),
     seconds: Math.min(600, Math.max(5, Math.round(Number(body.seconds) || 30))),
   };
   if (!input.context && !input.notes) return json(400, { error: 'Say what the video is about first.' });

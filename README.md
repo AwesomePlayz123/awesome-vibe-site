@@ -81,6 +81,8 @@ Drop, choose or paste (Ctrl+V) images in WebP, JPEG, JFIF, AVIF, GIF (first fram
 
 Say what the video is (e.g. "Game showcase"), add any details to work in, a style ("funny, personable, non-robotic") and a length (15–90s presets or any number of seconds), and it writes a voiceover script sized to fit: about 2.6 words per second, the natural pace of a Short. The word count and read time update as you edit, with a badge showing whether it fits. **Regenerate** keeps earlier versions as **Takes** you can flip between.
 
+**Saved styles**: **Edit styles** opens a popup where you name a style and paste your own instructions for the AI (your channel, series, script structure, voice, do's and don'ts). Pick it in the **Saved style** dropdown and the AI follows it first; the length you choose still sets the word count, and Style notes and Details add to it. Saved styles stay in your browser.
+
 **AI settings** picks the AI:
 
 - **Built-in AI** (default): Cloudflare Workers AI (Llama 3.3 70B), free within Cloudflare's daily allowance and no key needed. It has to be switched on once: in the Cloudflare dashboard open **Workers & Pages** → this site → **Settings** → **Bindings** → **Add** → **Workers AI**, variable name `AI`, save, then **Retry deployment** on the latest deployment. (A Workers deployment picks it up from `wrangler.jsonc` automatically.)

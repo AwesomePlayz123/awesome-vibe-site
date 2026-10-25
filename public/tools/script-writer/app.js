@@ -73,6 +73,89 @@ $('showKey').addEventListener('click', () => {
 // Open the settings automatically the first time someone picks their own AI without a key.
 if (mode === 'own' && !$('apiKey').value) $('aiSettings').open = true;
 
+/* ---------------- Saved styles (popup) ---------------- */
+let presets = [];
+try { presets = JSON.parse(store.get('presets', '[]')) || []; } catch { presets = []; }
+const savePresets = () => store.set('presets', JSON.stringify(presets));
+const presetById = (id) => presets.find((p) => p.id === id);
+
+function fillPresetSelect() {
+  const sel = $('preset');
+  const keep = store.get('preset', '');
+  sel.innerHTML = '<option value="">None</option>';
+  for (const p of presets) sel.add(new Option(p.name, p.id));
+  sel.value = presetById(keep) ? keep : '';
+  presetHint();
+}
+function presetHint() {
+  const p = presetById($('preset').value);
+  $('presetHint').textContent = p
+    ? `The AI follows “${p.name}” first. Style notes and details add to it.`
+    : presets.length ? 'Pick a saved style, or leave it on None.' : 'Save your own script format and voice once, then pick it here.';
+}
+$('preset').addEventListener('change', () => { store.set('preset', $('preset').value); presetHint(); });
+
+const dlg = $('presetDialog');
+let editing = null; // id of the style open in the editor, or null for a new one
+const pmsg = (t, k) => { $('presetMsg').textContent = t || ''; $('presetMsg').className = 'pd-msg' + (k ? ' ' + k : ''); };
+function renderPresetList() {
+  const ul = $('presetList');
+  ul.innerHTML = '';
+  if (!presets.length) { ul.innerHTML = '<li class="empty-note">No saved styles yet.</li>'; }
+  for (const p of presets) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = p.name;
+    b.setAttribute('aria-current', String(p.id === editing));
+    b.addEventListener('click', () => openEditor(p.id));
+    li.appendChild(b);
+    ul.appendChild(li);
+  }
+  $('presetDelete').hidden = !editing;
+}
+function openEditor(id) {
+  editing = id && presetById(id) ? id : null;
+  const p = presetById(editing);
+  $('presetName').value = p ? p.name : '';
+  $('presetText').value = p ? p.text : '';
+  pmsg('');
+  renderPresetList();
+  (p ? $('presetText') : $('presetName')).focus();
+}
+$('editPresets').addEventListener('click', () => {
+  dlg.showModal();
+  openEditor($('preset').value || presets[0]?.id || null);
+});
+$('presetNew').addEventListener('click', () => openEditor(null));
+$('presetSave').addEventListener('click', () => {
+  const name = $('presetName').value.trim();
+  const text = $('presetText').value.trim();
+  if (!name) { pmsg('Give the style a name.', 'err'); $('presetName').focus(); return; }
+  if (!text) { pmsg('Paste the instructions for the AI.', 'err'); $('presetText').focus(); return; }
+  let p = presetById(editing);
+  if (p) Object.assign(p, { name, text });
+  else { p = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, text }; presets.push(p); editing = p.id; }
+  savePresets();
+  store.set('preset', p.id); // pick the style you just saved
+  fillPresetSelect();
+  renderPresetList();
+  pmsg('Saved. It’s selected for your next script.', 'ok');
+});
+$('presetDelete').addEventListener('click', () => {
+  const p = presetById(editing);
+  if (!p) return;
+  presets = presets.filter((x) => x.id !== p.id);
+  savePresets();
+  if (store.get('preset', '') === p.id) store.set('preset', presets[0]?.id || null); // fall back to another saved style
+  fillPresetSelect();
+  openEditor(presets[0]?.id || null);
+  pmsg(`Deleted “${p.name}”.`);
+});
+for (const id of ['presetClose', 'presetCancel']) $(id).addEventListener('click', () => dlg.close());
+dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); }); // click outside to close
+fillPresetSelect();
+
 /* ---------------- Length ---------------- */
 function setSeconds(s, fromInput) {
   seconds = Math.min(600, Math.max(5, Math.round(Number(s) || 30)));
@@ -171,7 +254,7 @@ async function generate() {
     const res = await fetch('/api/script', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ provider, model: own ? $('model').value.trim() : '', context, notes, style: $('style').value.trim(), seconds }),
+      body: JSON.stringify({ provider, model: own ? $('model').value.trim() : '', context, notes, style: $('style').value.trim(), seconds, guide: presetById($('preset').value)?.text || '' }),
     });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) {
