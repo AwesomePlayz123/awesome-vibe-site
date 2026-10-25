@@ -37,7 +37,7 @@
           <button type="button" data-v="no" aria-pressed="false">Not Recommended</button>
         </div>
 
-        <h2>Profile</h2>
+        <details class="sec" data-sec="profile"><summary>Profile</summary><div class="sec-body">
         <div class="field">
           <span class="label">Picture</span>
           <div class="pic-row">
@@ -59,7 +59,8 @@
           <div class="field"><label class="label" for="products">Products in account</label><input id="products" type="text" maxlength="8" placeholder="Optional" autocomplete="off"></div>
         </div>
 
-        <h2>Playtime and dates</h2>
+        </div></details>
+        <details class="sec" data-sec="playtime-and-dates"><summary>Playtime and dates</summary><div class="sec-body">
         <div class="two">
           <div class="field"><label class="label" for="hours">Hours on record</label><input id="hours" type="text" maxlength="10" value="2.1" autocomplete="off"></div>
           <div class="field"><label class="label" for="atreview">Hours at review time</label><input id="atreview" type="text" maxlength="10" value="0.9" placeholder="Optional" autocomplete="off"></div>
@@ -74,7 +75,8 @@
           <label class="check"><input type="checkbox" id="refunded"> Product refunded</label>
         </div>
 
-        <h2>Review</h2>
+        </div></details>
+        <details class="sec" data-sec="review" open><summary>Review</summary><div class="sec-body">
         <div class="field">
           <div class="tools" id="bb">
             <button type="button" class="btn small" data-o="[b]" data-c="[/b]"><b>B</b></button>
@@ -91,7 +93,8 @@
           <p class="hint">Steam formatting works: [b] [i] [u] [strike] [spoiler] [h1]-[h3] [hr] [list] [*]</p>
         </div>
 
-        <h2>Votes</h2>
+        </div></details>
+        <details class="sec" data-sec="votes"><summary>Votes</summary><div class="sec-body">
         <div class="two">
           <div class="field"><label class="label" for="helpful">Found helpful</label><input id="helpful" type="text" maxlength="8" value="64" autocomplete="off"></div>
           <div class="field"><label class="label" for="funny">Found funny</label><input id="funny" type="text" maxlength="8" value="73" autocomplete="off"></div>
@@ -103,11 +106,12 @@
           <div id="awards" class="awards"></div>
         </div>
 
-        <h2>Display</h2>
-        <label class="check"><input type="checkbox" id="user" checked> Show user info (picture, name, review count)</label>
+        </div></details>
+        <details class="sec" data-sec="display"><summary>Display</summary><div class="sec-body">
+        <label class="check"><input type="checkbox" id="user"> Show user info (picture, name, review count)</label>
         <div class="two">
           <div class="field"><label class="label" for="header">Section header</label>
-            <select id="header"><option value="helpful">Most helpful (180 days)</option><option value="overall">Most helpful (overall)</option><option value="none">None</option></select></div>
+            <select id="header"><option value="none" selected>None</option><option value="helpful">Most helpful (180 days)</option><option value="overall">Most helpful (overall)</option></select></div>
           <div class="field"><label class="label" for="bg">Background</label>
             <select id="bg"><option value="steam">Steam page blue</option><option value="clear">Transparent</option></select></div>
         </div>
@@ -119,6 +123,7 @@
         </div>
         <div class="field"><label class="label" for="scale">Image quality</label>
           <select id="scale"><option value="1">Normal (1x)</option><option value="2" selected>High (2x)</option><option value="3">Ultra (3x)</option></select></div>
+        </div></details>
       </form>
 
       <div class="panel preview">

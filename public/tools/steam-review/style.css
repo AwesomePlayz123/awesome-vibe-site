@@ -13,7 +13,7 @@
 .check { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
 .check input { accent-color: var(--accent); }
 
-.form input[type="text"], .form textarea, .form select {
+.form input[type="text"], .form input[type="url"], .form textarea, .form select {
   width: 100%; font: inherit; color: var(--ink); background: var(--bg);
   border: 1px solid var(--line); border-radius: 12px; padding: .65rem .8rem;
 }
@@ -52,3 +52,12 @@
 .link-row .btn { white-space: nowrap; }
 #linkStatus.err { color: #ff7a6b; }
 #linkStatus.ok { color: #7fd99a; }
+
+/* Collapsible sections */
+details.sec { border-top: 1px solid var(--line); }
+details.sec > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 14px 0; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); user-select: none; }
+details.sec > summary::-webkit-details-marker { display: none; }
+details.sec > summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-right: 4px; transition: transform .15s; }
+details.sec[open] > summary::after { transform: rotate(-135deg); }
+details.sec > summary:hover { color: var(--ink); }
+.sec-body { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }

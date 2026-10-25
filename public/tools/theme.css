@@ -53,7 +53,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
 .form h2 { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 
 /* inputs → ours */
-.form input[type="text"], .form input[type="password"], .form textarea, .form select,
+.form input[type="text"], .form input[type="url"], .form input[type="password"], .form textarea, .form select,
 .controls input[type="text"], .controls input[type="password"], .controls textarea, .controls select,
 .bcard input, .row input[type="text"], .row input[type="password"] {
   font: 14px var(--font); color: var(--ink); background: var(--bg);

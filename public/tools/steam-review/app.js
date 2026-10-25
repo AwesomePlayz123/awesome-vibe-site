@@ -504,8 +504,9 @@
     Object.entries(f).forEach(([k, v]) => ($(k).value = v));
     $('text').value = SAMPLE;
     ['free', 'early', 'refunded'].forEach((k) => ($(k).checked = false));
-    $('buttons').checked = true; $('user').checked = true;
-    ['namecolor', 'header', 'bg', 'lang', 'font'].forEach((k) => ($(k).selectedIndex = 0));
+    $('buttons').checked = true; $('user').checked = false;
+    ['namecolor', 'bg', 'lang', 'font'].forEach((k) => ($(k).selectedIndex = 0));
+    $('header').value = 'none';
     $('scale').value = '2';
     document.querySelectorAll('.award').forEach((r, i) => { r.querySelector('select').value = AWARD_DEFAULTS[i][0]; r.querySelector('input').value = AWARD_DEFAULTS[i][1]; });
     rec = 'yes';
@@ -528,6 +529,13 @@
     try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': await toBlob() })]); btn.textContent = 'Copied!'; }
     catch (e) { btn.textContent = 'Copy failed'; }
     setTimeout(() => (btn.textContent = 'Copy'), 1500);
+  });
+
+  // ---------- Collapsible sections (remembers which ones you left open) ----------
+  document.querySelectorAll('details.sec').forEach((d) => {
+    const key = 'steam-review.open.' + d.dataset.sec;
+    try { const v = localStorage.getItem(key); if (v !== null) d.open = v === '1'; } catch (e) {}
+    d.addEventListener('toggle', () => { try { localStorage.setItem(key, d.open ? '1' : '0'); } catch (e) {} });
   });
 
   // ---------- Optional: copy a real review from its link ----------
