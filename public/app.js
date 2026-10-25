@@ -237,7 +237,7 @@ async function render(g) {
   const base = slug(g.name);
 
   // Logo
-  showImageOrEmpty($('#logoImg'), g.images.logo, 'This game has no library logo on Steam.');
+  showImageOrEmpty($('#logoImg'), g.images.logo, 'Couldn’t find a library logo for this game. Try again in a bit, or grab it from SteamGridDB.');
   setDownloadLink($('#logoDl'), g.images.logo, `${base} - Logo.png`);
 
   // Cover
